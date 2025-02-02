@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
-// import { PieChart } from "react-native-chart-kit";
+import { PieChart } from "react-native-chart-kit";
 
 const StockPortfolio = () => {
   const totalInvested = "₹69.5L";
@@ -48,7 +48,7 @@ const StockPortfolio = () => {
       {/* Stock Analysis */}
       <View style={styles.card}>
         <Text style={styles.heading}>Stock Analysis</Text>
-        {/* <PieChart
+        <PieChart
           data={chartData}
           width={320}
           height={180}
@@ -57,7 +57,7 @@ const StockPortfolio = () => {
           backgroundColor={"transparent"}
           paddingLeft={"15"}
           absolute
-        /> */}
+        />
         <Text style={styles.subText}>
           Your stock portfolio shows strong potential with key performers driving growth.
         </Text>

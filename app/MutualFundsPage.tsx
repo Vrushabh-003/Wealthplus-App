@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Button, StyleSheet, ActivityIndicator, ScrollView, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RouteProp } from '@react-navigation/native';
+import { TouchableOpacity } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 interface PortfolioData {
   totalInvested: string;
@@ -14,8 +17,16 @@ interface PortfolioData {
   sharpeRatio: string;
 }
 
-const MutualFundsPage: React.FC = () => {
-  const navigation = useNavigation(); // ✅ Fix: Use useNavigation()
+type RootStackParamList = {
+  MutualFundsPage: undefined;
+};
+
+type MutualFundsPageProps = {
+  navigation: NativeStackNavigationProp<RootStackParamList, 'MutualFundsPage'>;
+  route: RouteProp<RootStackParamList, 'MutualFundsPage'>;
+};
+
+const MutualFundsPage: React.FC<MutualFundsPageProps> = ({ navigation }) => {
   const [portfolioData, setPortfolioData] = useState<PortfolioData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -25,6 +36,7 @@ const MutualFundsPage: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
+        // Simulating the API response with dummy data
         const response = {
           data: {
             totalInvested: "₹1.6Cr",
@@ -68,8 +80,10 @@ const MutualFundsPage: React.FC = () => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
+      <TouchableOpacity onPress={() => navigation.goBack()}>
+      <Icon name="arrow-back" size={30} color="#000" />
+    </TouchableOpacity>
         <Text style={styles.title}>Mutual Funds</Text>
-        <Button title="Go Back" onPress={() => navigation.goBack()} /> 
       </View>
 
       {portfolioData && (
@@ -93,9 +107,7 @@ const MutualFundsPage: React.FC = () => {
                 <Text>Benchmark XIRR</Text>
               </View>
             </View>
-            <Text style={styles.cardText}>
-              Your portfolio could have potentially earned {portfolioData.potentialEarnings} more with active investing
-            </Text>
+            <Text style={styles.cardText}>Your portfolio could have potentially earned {portfolioData.potentialEarnings} more with active investing</Text>
           </View>
 
           <View style={styles.analysisSection}>
@@ -135,8 +147,8 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    // justifyContent: 'space-between',
+    alignItems: 'flex-start',
     backgroundColor: '#fff',
     padding: 20,
     borderRadius: 10,

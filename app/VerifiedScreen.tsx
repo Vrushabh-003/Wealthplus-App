@@ -13,7 +13,7 @@ const VerifiedScreen = () => {
     // Set a timeout to navigate to the Dashboard screen after 3 seconds
     const timer = setTimeout(() => {
       navigation.navigate("Dashboard");
-    }, 3000); // 3000 milliseconds = 3 seconds
+    }, 1000); // 1000 milliseconds = 1 seconds
 
     // Clear the timeout if the component is unmounted
     return () => clearTimeout(timer);

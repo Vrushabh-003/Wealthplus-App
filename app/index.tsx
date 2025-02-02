@@ -15,6 +15,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Dashboard from "./Dashboard";
 import MutualFundsPage from "./MutualFundsPage";
 import StockPortfolio from "./StockPortfolio";
+import { Header } from "react-native/Libraries/NewAppScreen";
 
 export type RootStackParamList = {
   LandingPage: undefined;
@@ -33,14 +34,14 @@ const Tab = createBottomTabNavigator();
 export default function App() {
   return (
     <Stack.Navigator initialRouteName="LandingPage">
-      <Stack.Screen name="LandingPage" component={LandingPage} />
-      <Stack.Screen name="PhoneNumberScreen" component={PhoneNumberScreen} />
-      <Stack.Screen name="PANInputScreen" component={PANInputScreen} />
-      <Stack.Screen name="OTPScreen" component={OTPScreen} />
-      <Stack.Screen name="VerifiedScreen" component={VerifiedScreen} />
-      <Stack.Screen name="Dashboard" component={Dashboard} />
-      <Stack.Screen name="MutualFundsPage" component={MutualFundsPage}/>
-      <Stack.Screen name="StockPortfolio" component={StockPortfolio}/>
+      <Stack.Screen name="LandingPage" component={LandingPage} options={{headerShown:false}} />
+      <Stack.Screen name="PhoneNumberScreen" component={PhoneNumberScreen} options={{headerShown:false}} />
+      <Stack.Screen name="PANInputScreen" component={PANInputScreen} options={{headerShown:false}}/>
+      <Stack.Screen name="OTPScreen" component={OTPScreen} options={{headerShown:false}} />
+      <Stack.Screen name="VerifiedScreen" component={VerifiedScreen} options={{headerShown:false}} />
+      <Stack.Screen name="Dashboard" component={Dashboard}  options={{headerShown:false}}/>
+      <Stack.Screen name="MutualFundsPage" component={MutualFundsPage} options={{headerShown:false}}/>
+      <Stack.Screen name="StockPortfolio" component={StockPortfolio} options={{headerShown:false}}/>
     </Stack.Navigator>
   );
 }
