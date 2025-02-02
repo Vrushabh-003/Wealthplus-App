@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, StyleSheet, ActivityIndicator, ScrollView, Image } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  ScrollView,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RouteProp } from '@react-navigation/native';
-import { TouchableOpacity } from 'react-native';
+import { RouteProp, useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { PieChart } from 'react-native-chart-kit';
 
 interface PortfolioData {
   totalInvested: string;
@@ -19,27 +27,62 @@ interface PortfolioData {
 
 type RootStackParamList = {
   MutualFundsPage: undefined;
+  Dashboard: undefined;
 };
 
-type MutualFundsPageProps = {
-  navigation: NativeStackNavigationProp<RootStackParamList, 'MutualFundsPage'>;
-  route: RouteProp<RootStackParamList, 'MutualFundsPage'>;
-};
-
-const MutualFundsPage: React.FC<MutualFundsPageProps> = ({ navigation }) => {
+const MutualFundsPage: React.FC = () => {
   const [portfolioData, setPortfolioData] = useState<PortfolioData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  // Donut chart data (similar to StockPortfolio)
+  const donutData = [
+    {
+      name: "Doing Good",
+      amount: 21.1,
+      color: "#28A745",
+      legendFontColor: "#7F7F7F",
+      legendFontSize: 12,
+    },
+    {
+      name: "Keep Monitoring",
+      amount: 59.0,
+      color: "#F57C00",
+      legendFontColor: "#7F7F7F",
+      legendFontSize: 12,
+    },
+    {
+      name: "Low Performing",
+      amount: 7.8,
+      color: "#DC3545",
+      legendFontColor: "#7F7F7F",
+      legendFontSize: 12,
+    },
+  ];
+
+  const screenWidth = Dimensions.get('window').width;
+  const chartConfig = {
+    backgroundGradientFrom: "#fff",
+    backgroundGradientTo: "#fff",
+    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+    strokeWidth: 2,
+    useShadowColorFromDataset: false,
+  };
+
+  const parsePercentage = (xirr: string) => {
+    return parseFloat(xirr.replace('%', '').replace('+', ''));
+  };
 
   useEffect(() => {
     const fetchPortfolioData = async () => {
       setLoading(true);
       setError(null);
       try {
-        // Simulating the API response with dummy data
+        // Simulate API response with dummy data
         const response = {
           data: {
-            totalInvested: "₹1.6Cr",
+            totalInvested: "₹1.2Cr",
             overallGains: "₹28.4L (23.67%)",
             portfolioXirr: "+20.21%",
             benchmarkXirr: "+19.55%",
@@ -48,7 +91,7 @@ const MutualFundsPage: React.FC<MutualFundsPageProps> = ({ navigation }) => {
             beta: "1.82",
             rSquared: "0.76",
             sharpeRatio: "1.2",
-          }
+          },
         };
         setPortfolioData(response.data);
       } catch (err) {
@@ -61,9 +104,34 @@ const MutualFundsPage: React.FC<MutualFundsPageProps> = ({ navigation }) => {
     fetchPortfolioData();
   }, []);
 
+  // Calculate performance details similar to StockPortfolio
+  let greaterValue = 0,
+    smallerValue = 0,
+    difference = 0,
+    greaterLabel = '',
+    smallerLabel = '';
+
+  if (portfolioData) {
+    const portfolioXirrNum = parsePercentage(portfolioData.portfolioXirr);
+    const benchmarkXirrNum = parsePercentage(portfolioData.benchmarkXirr);
+
+    if (portfolioXirrNum >= benchmarkXirrNum) {
+      greaterValue = portfolioXirrNum;
+      smallerValue = benchmarkXirrNum;
+      greaterLabel = "Portfolio XIRR";
+      smallerLabel = "Benchmark XIRR";
+    } else {
+      greaterValue = benchmarkXirrNum;
+      smallerValue = portfolioXirrNum;
+      greaterLabel = "Benchmark XIRR";
+      smallerLabel = "Portfolio XIRR";
+    }
+    difference = greaterValue - smallerValue;
+  }
+
   if (loading) {
     return (
-      <View style={styles.container}>
+      <View style={styles.centerContainer}>
         <ActivityIndicator size="large" color="#4caf50" />
       </View>
     );
@@ -71,7 +139,7 @@ const MutualFundsPage: React.FC<MutualFundsPageProps> = ({ navigation }) => {
 
   if (error) {
     return (
-      <View style={styles.container}>
+      <View style={styles.centerContainer}>
         <Text style={styles.errorText}>{error}</Text>
       </View>
     );
@@ -80,58 +148,119 @@ const MutualFundsPage: React.FC<MutualFundsPageProps> = ({ navigation }) => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-      <TouchableOpacity onPress={() => navigation.goBack()}>
-      <Icon name="arrow-back" size={30} color="#000" />
-    </TouchableOpacity>
+        <Text style={styles.logotitle}>WealthPlus</Text>
+      </View>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Icon name="arrow-back" size={30} color="#000" />
+        </TouchableOpacity>
         <Text style={styles.title}>Mutual Funds</Text>
       </View>
 
       {portfolioData && (
         <>
+          {/* Investment Summary */}
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>Total Invested</Text>
-            <Text style={styles.cardText}>{portfolioData.totalInvested}</Text>
-            <Text style={styles.cardTitle}>Overall Gains</Text>
-            <Text style={styles.cardText}>{portfolioData.overallGains}</Text>
-          </View>
-
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>How did your portfolio perform?</Text>
-            <View style={styles.performanceContainer}>
-              <View style={styles.performanceCard}>
-                <Text style={styles.performanceText}>{portfolioData.portfolioXirr}</Text>
-                <Text>Portfolio XIRR</Text>
+            <Text style={styles.subTitle}>Updated as of 21 Dec 24</Text>
+            <Text style={styles.cardTitle}>1.6Cr</Text>
+            <View style={styles.rowContainer}>
+              <View>
+                <Text style={styles.subTitle}>Total Invested</Text>
+                <Text style={styles.cardText}>{portfolioData.totalInvested}</Text>
               </View>
-              <View style={styles.performanceCard}>
-                <Text style={styles.performanceText}>{portfolioData.benchmarkXirr}</Text>
-                <Text>Benchmark XIRR</Text>
+              <View>
+                <Text style={styles.subTitle}>Overall Gains</Text>
+                <Text style={styles.cardText}>{portfolioData.overallGains}</Text>
               </View>
             </View>
-            <Text style={styles.cardText}>Your portfolio could have potentially earned {portfolioData.potentialEarnings} more with active investing</Text>
           </View>
 
+          {/* Performance Section (Updated to match StockPortfolio) */}
+          <View style={styles.card}>
+            <Text style={styles.headerText}>How did your portfolio perform?</Text>
+            <View style={styles.newPerformanceContainer}>
+              <View style={styles.leftBlock}>
+                <Text style={styles.largerText}>{`${greaterValue.toFixed(2)}%`}</Text>
+                <Text style={styles.blockLabel}>{greaterLabel}</Text>
+              </View>
+              <View style={styles.rightContainer}>
+                <View style={styles.topRightBlock}>
+                  <Text style={styles.performanceText}>{`+${difference.toFixed(2)}%`}</Text>
+                  <Text style={styles.blockLabel}>Difference</Text>
+                </View>
+                <View style={styles.bottomRightBlock}>
+                  <Text style={styles.performanceText}>{`${smallerValue.toFixed(2)}%`}</Text>
+                  <Text style={styles.blockLabel}>{smallerLabel}</Text>
+                </View>
+              </View>
+            </View>
+            <Text style={styles.cardNote}>
+              Your portfolio could have potentially earned {portfolioData.potentialEarnings} more with active investing
+            </Text>
+          </View>
+
+          {/* Analysis Section (Updated to match StockPortfolio) */}
           <View style={styles.analysisSection}>
-            <Text style={styles.cardTitle}>Mutual Fund Analysis</Text>
+            <Text style={styles.headerText}>Mutual Fund Analysis</Text>
             <View style={styles.graphContainer}>
-              <Image source={{ uri: '/path-to-your-chart-image.png' }} style={styles.chartImage} />
+              <PieChart
+                data={donutData}
+                width={screenWidth * 0.9}
+                height={220}
+                chartConfig={chartConfig}
+                accessor="amount"
+                backgroundColor="transparent"
+                paddingLeft="84"
+                absolute
+                hasLegend={false}
+              />
+              <View style={styles.donutCenter}>
+                <Text style={styles.donutCenterText}>Analysis</Text>
+              </View>
             </View>
-            <Text style={styles.cardText}>{portfolioData.analysisSummary}</Text>
-            <Text style={styles.cardText}>Consider rebalancing low-performing funds to optimize returns.</Text>
+
+            {/* Legends */}
+            <View style={styles.legendContainer}>
+              {donutData.map((item, index) => (
+                <View key={index} style={styles.legendItem}>
+                  <View style={[styles.legendColor, { backgroundColor: item.color }]} />
+                  <Text style={styles.legendText}>{`${item.name} (${item.amount}%)`}</Text>
+                </View>
+              ))}
+            </View>
+
+            <Text style={styles.subTitle}>{portfolioData.analysisSummary}</Text>
+            <Text style={styles.subTitle}>Consider rebalancing low-performing funds to optimize returns.</Text>
           </View>
 
-          <View style={styles.strongPerformance}>
-            <View style={styles.metricCard}>
-              <Text style={styles.metricValue}>{portfolioData.beta}</Text>
-              <Text>Beta</Text>
+          {/* Metrics Section */}
+          <View style={styles.card}>
+            <View style={styles.header}>
+              <Text style={styles.headerText}>Strong performance, with high volatility</Text>
             </View>
-            <View style={styles.metricCard}>
-              <Text style={styles.metricValue}>{portfolioData.rSquared}</Text>
-              <Text>R-squared</Text>
+            <View style={styles.metricsContainer}>
+              <View style={[styles.metricCard, styles.betaCard]}>
+                <Text style={styles.metricValue}>{portfolioData.beta}</Text>
+                <Text style={styles.metricTitle}>Beta</Text>
+                <Text style={styles.metricSubtitle}>Volatility</Text>
+              </View>
+              <View style={[styles.metricCard, styles.rSquaredCard]}>
+                <Text style={styles.metricValue}>{portfolioData.rSquared}</Text>
+                <Text style={styles.metricTitle}>R-squared</Text>
+                <Text style={styles.metricSubtitle}>Correlation</Text>
+              </View>
+              <View style={[styles.metricCard, styles.sharpeCard]}>
+                <Text style={styles.metricValue}>{portfolioData.sharpeRatio}</Text>
+                <Text style={styles.metricTitle}>Sharpe ratio</Text>
+                <Text style={styles.metricSubtitle}>Return per risk</Text>
+              </View>
             </View>
-            <View style={styles.metricCard}>
-              <Text style={styles.metricValue}>{portfolioData.sharpeRatio}</Text>
-              <Text>Sharpe Ratio</Text>
-            </View>
+            <Text style={styles.description}>
+              Portfolio shows high returns but with increased market sensitivity
+            </Text>
+            <Text style={styles.description}>
+              Most peer portfolios achieve similar returns with lower risk
+            </Text>
           </View>
         </>
       )}
@@ -145,18 +274,36 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f7fb',
     padding: 20,
   },
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  rowContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
   header: {
     flexDirection: 'row',
-    // justifyContent: 'space-between',
     alignItems: 'flex-start',
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 10,
     marginBottom: 20,
+  },
+  headerText: {
+    fontSize: 18,
+    fontWeight: 500,
+    flex: 1,
+  },
+  logotitle: {
+    fontSize: 28,
+    color: '#3b3b3b',
+    marginLeft: 20,
+    fontWeight: '500',
   },
   title: {
     fontSize: 24,
     color: '#3b3b3b',
+    marginLeft: 20,
+    fontWeight: '400',
   },
   card: {
     backgroundColor: '#fff',
@@ -170,37 +317,74 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   cardTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 28,
+    fontWeight: '500',
     marginBottom: 10,
+  },
+  subTitle: {
+    fontSize: 16,
+    fontWeight: '400',
+    marginBottom: 10,
+    color: '#777777',
   },
   cardText: {
-    fontSize: 16,
+    fontSize: 18,
     color: '#4caf50',
+    fontWeight: '600',
   },
-  performanceContainer: {
+  cardNote: {
+    fontSize: 16,
+    color: '#ee2222',
+  },
+  // Performance Section styles (matching StockPortfolio)
+  newPerformanceContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     marginBottom: 10,
   },
-  performanceCard: {
-    flex: 1,
+  leftBlock: {
+    flex: 1.5,
+    backgroundColor: '#ecfdf5',
+    height: 100,
+    justifyContent: 'center',
     alignItems: 'center',
-    padding: 10,
-    backgroundColor: '#fff',
+    marginRight: 10,
     borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-    marginHorizontal: 5,
+  },
+  rightContainer: {
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+  topRightBlock: {
+    backgroundColor: '#fef4e8',
+    height: 45,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+    marginBottom: 5,
+  },
+  bottomRightBlock: {
+    backgroundColor: '#ecfdf5',
+    height: 45,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+  },
+  largerText: {
+    fontSize: 24,
+    color: '#4caf50',
+    fontWeight: 'bold',
   },
   performanceText: {
     fontSize: 18,
-    color: '#4caf50',
+    color: '#2222ff',
     fontWeight: 'bold',
   },
+  blockLabel: {
+    fontSize: 14,
+    color: '#555',
+    marginTop: 4,
+  },
+  // Analysis Section styles (matching StockPortfolio)
   analysisSection: {
     backgroundColor: '#fff',
     padding: 20,
@@ -214,24 +398,52 @@ const styles = StyleSheet.create({
   },
   graphContainer: {
     alignItems: 'center',
+    justifyContent: 'center',
     marginVertical: 20,
   },
-  chartImage: {
-    width: 300,
-    height: 200,
-    resizeMode: 'contain',
+  donutCenter: {
+    position: 'absolute',
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  strongPerformance: {
+  donutCenterText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    textAlign: 'center',
+  },
+  legendContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    marginTop: 10,
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 20,
+    marginBottom: 10,
+  },
+  legendColor: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginRight: 5,
+  },
+  legendText: {
+    fontSize: 14,
+    color: '#7F7F7F',
+  },
+  // Metrics Section styles (reuse from MutualFundsPage)
+  metricsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    marginBottom: 12,
   },
   metricCard: {
     flex: 1,
@@ -251,10 +463,33 @@ const styles = StyleSheet.create({
     color: '#4caf50',
     fontWeight: 'bold',
   },
+  metricTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginTop: 4,
+  },
+  metricSubtitle: {
+    fontSize: 12,
+    color: '#666',
+  },
   errorText: {
     fontSize: 16,
     color: 'red',
     textAlign: 'center',
+  },
+  description: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 4,
+  },
+  betaCard: {
+    backgroundColor: '#ecfdf5',
+  },
+  rSquaredCard: {
+    backgroundColor: '#ecfdf5',
+  },
+  sharpeCard: {
+    backgroundColor: '#ecfdf5',
   },
 });
 
