@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
+import {RootStackParamList} from './index';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp, useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -25,10 +26,9 @@ interface PortfolioData {
   sharpeRatio: string;
 }
 
-type RootStackParamList = {
-  MutualFundsPage: undefined;
-  Dashboard: undefined;
-};
+// type RootStackParamList = {
+//   MutualFundsPage: undefined;
+// };
 
 const MutualFundsPage: React.FC = () => {
   const [portfolioData, setPortfolioData] = useState<PortfolioData | null>(null);
@@ -37,29 +37,7 @@ const MutualFundsPage: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   // Donut chart data (similar to StockPortfolio)
-  const donutData = [
-    {
-      name: "Doing Good",
-      amount: 21.1,
-      color: "#28A745",
-      legendFontColor: "#7F7F7F",
-      legendFontSize: 12,
-    },
-    {
-      name: "Keep Monitoring",
-      amount: 59.0,
-      color: "#F57C00",
-      legendFontColor: "#7F7F7F",
-      legendFontSize: 12,
-    },
-    {
-      name: "Low Performing",
-      amount: 7.8,
-      color: "#DC3545",
-      legendFontColor: "#7F7F7F",
-      legendFontSize: 12,
-    },
-  ];
+  
 
   const screenWidth = Dimensions.get('window').width;
   const chartConfig = {
@@ -104,12 +82,92 @@ const MutualFundsPage: React.FC = () => {
     fetchPortfolioData();
   }, []);
 
+  const [Portfoliohealth, setPortfolioHealth] = useState<any>(null);
+  useEffect(() => {
+      const fetchPortfolioStatus = async () => {
+        try {
+          const response = await fetch('http://api.inwealthera.com/api/portfolio/getPortfolioHealth', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              reqId: '15043487',
+              mobile: '+919940615334',
+              type: 'mutual_funds',
+            }),
+          });
+          const data = await response.json();
+          setPortfolioHealth(data);
+          console.log('Portfolio status:', data);
+        } catch (error) {
+          console.error('Error fetching portfolio status:', error);
+        }
+      };
+  
+      fetchPortfolioStatus();
+    }, []);
+
+
+  const [Portfolioheader, setPortfolioHeader] = useState<any>(null);
+  useEffect(() => {
+      const fetchPortfolioStatus = async () => {
+        try {
+          const response = await fetch('http://api.inwealthera.com/api/portfolio/getPortfolioHeader', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              reqId: '15043487',
+              mobile: '+919940615334',
+              type: 'mutual_funds',
+            }),
+          });
+          const data = await response.json();
+          setPortfolioHeader(data);
+          console.log('Portfolio status:', data);
+        } catch (error) {
+          console.error('Error fetching portfolio status:', error);
+        }
+      };
+  
+      fetchPortfolioStatus();
+    }, []);
+
+    const [Portfoliodetails, setPortfolioDetails] = useState<any>(null);
+    useEffect(() => {
+        const fetchPortfolioStatus = async () => {
+          try {
+            const response = await fetch('http://api.inwealthera.com/api/portfolio/getPortfolioDetails', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                reqId: '15043487',
+                mobile: '+919940615334',
+                type: 'mutual_funds',
+              }),
+            });
+            const data = await response.json();
+            setPortfolioDetails(data);
+            console.log('Portfolio status:', data);
+          } catch (error) {
+            console.error('Error fetching portfolio status:', error);
+          }
+        };
+    
+        fetchPortfolioStatus();
+      }, []);
+
   // Calculate performance details similar to StockPortfolio
   let greaterValue = 0,
     smallerValue = 0,
     difference = 0,
     greaterLabel = '',
     smallerLabel = '';
+
 
   if (portfolioData) {
     const portfolioXirrNum = parsePercentage(portfolioData.portfolioXirr);
@@ -145,32 +203,78 @@ const MutualFundsPage: React.FC = () => {
     );
   }
 
+  // Function to format numbers into 1K, 1L, 1Cr, etc.
+  const formatNumber = (num: string) => {
+    const number = parseFloat(num);  // Convert the string to a number
+  
+    if (isNaN(number)) return "Invalid value"; // Return if it's not a valid number
+  
+    if (number >= 10000000) {
+      // For Crores (10 million and above)
+      return (number / 10000000).toFixed(2) + 'Cr'; // Keeping 2 decimals for Cr
+    } else if (number >= 100000) {
+      // For Lakhs (100 thousand and above)
+      return (number / 100000).toFixed(2) + 'L'; // Keeping 2 decimals for L
+    } else if (number >= 1000) {
+      // For Thousands
+      return (number / 1000).toFixed(2) + 'K'; // Keeping 2 decimals for K
+    } else {
+      return number.toString(); // For smaller numbers
+    }
+  };
+
+  const donutData = [
+    {
+      name: "Buy",
+      amount: {0},
+      color: "#28A745",
+      legendFontColor: "#7F7F7F",
+      legendFontSize: 12,
+    },
+    {
+      name: "Hold",
+      amount: 59.0,
+      color: "#F57C00",
+      legendFontColor: "#7F7F7F",
+      legendFontSize: 12,
+    },
+    {
+      name: "Sell",
+      amount: 7.8,
+      color: "#DC3545",
+      legendFontColor: "#7F7F7F",
+      legendFontSize: 12,
+    },
+  ];
+  
+
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.logotitle}>WealthPlus</Text>
       </View>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity onPress={() => navigation.navigate('Dashboard')}>
           <Icon name="arrow-back" size={30} color="#000" />
         </TouchableOpacity>
         <Text style={styles.title}>Mutual Funds</Text>
       </View>
 
-      {portfolioData && (
+      {portfolioData && Portfoliodetails && Portfolioheader && Portfoliohealth && (
         <>
           {/* Investment Summary */}
           <View style={styles.card}>
-            <Text style={styles.subTitle}>Updated as of 21 Dec 24</Text>
-            <Text style={styles.cardTitle}>1.6Cr</Text>
+            <Text style={styles.subTitle}>Updated as of {Portfolioheader.navDate}</Text>
+            <Text style={styles.cardTitle}>₹{formatNumber(Portfolioheader.currentMktValue)}</Text>
             <View style={styles.rowContainer}>
               <View>
                 <Text style={styles.subTitle}>Total Invested</Text>
-                <Text style={styles.cardText}>{portfolioData.totalInvested}</Text>
+                <Text style={styles.cardText}>{formatNumber(Portfolioheader.costValue)}</Text>
               </View>
               <View>
                 <Text style={styles.subTitle}>Overall Gains</Text>
-                <Text style={styles.cardText}>{portfolioData.overallGains}</Text>
+                <Text style={styles.cardText}>{(formatNumber(Portfolioheader.gainLoss))+"("+(Portfolioheader.gainLossPercentage)+")%"}</Text>
               </View>
             </View>
           </View>

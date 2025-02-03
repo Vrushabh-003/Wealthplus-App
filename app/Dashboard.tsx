@@ -1,6 +1,6 @@
-import React from 'react';
-import { View,ScrollView, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useCallback } from 'react';
+import { View,ScrollView, Text, StyleSheet, TouchableOpacity, BackHandler,  Alert } from 'react-native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { RootStackParamList } from './index'; // Adjust the import path as needed
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
@@ -10,6 +10,52 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Dashboard'>
 const Dashboard = () => {
   // Use the correct navigation prop type
   const navigation = useNavigation<NavigationProp>();
+  const [data, setData] = React.useState();
+  const [Portfoliostatus, setPortfolioStatus] = React.useState();
+
+  //API integration
+  useEffect(() => {
+    const fetchPortfolioStatus = async () => {
+      try {
+        const response = await fetch('http://api.inwealthera.com/api/portfolio/getPortfolioAnalysisReadyStatus', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            reqId: '15043487',
+            mobile: '+919940615334',
+            type: 'mutual_funds',
+          }),
+        });
+        const data = await response.json();
+        setPortfolioStatus(data);
+        console.log('Portfolio status:', data);
+      } catch (error) {
+        console.error('Error fetching portfolio status:', error);
+      }
+    };
+
+    fetchPortfolioStatus();
+  }, []);
+
+
+
+
+  useFocusEffect(
+    useCallback(() => {
+      const backAction = () => {
+        Alert.alert('Exit App', 'Do you want to exit?', [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Exit', onPress: () => BackHandler.exitApp() },
+        ]);
+        return true;
+      };
+
+      const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+      return () => backHandler.remove();
+    }, [])
+  );
 
   return (
     <ScrollView style={styles.container}>

@@ -4,8 +4,10 @@
     "strict": true,
     "jsx": "react-native",
     "baseUrl": "./",
+    "esModuleInterop": true,
     "paths": {
       "@/*": ["./*"]
+      
     }
   },
   "include": [
