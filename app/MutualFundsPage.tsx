@@ -14,24 +14,24 @@ import { RouteProp, useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { PieChart } from 'react-native-chart-kit';
 
-interface PortfolioData {
-  totalInvested: string;
-  overallGains: string;
-  portfolioXirr: string;
-  benchmarkXirr: string;
-  potentialEarnings: string;
-  analysisSummary: string;
-  beta: string;
-  rSquared: string;
-  sharpeRatio: string;
-}
+// interface PortfolioData {
+//   totalInvested: string;
+//   overallGains: string;
+//   portfolioXirr: string;
+//   benchmarkXirr: string;
+//   potentialEarnings: string;
+//   analysisSummary: string;
+//   beta: string;
+//   rSquared: string;
+//   sharpeRatio: string;
+// }
 
 // type RootStackParamList = {
 //   MutualFundsPage: undefined;
 // };
 
 const MutualFundsPage: React.FC = () => {
-  const [portfolioData, setPortfolioData] = useState<PortfolioData | null>(null);
+  // const [portfolioData, setPortfolioData] = useState<PortfolioData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -48,39 +48,35 @@ const MutualFundsPage: React.FC = () => {
     useShadowColorFromDataset: false,
   };
 
-  const parsePercentage = (xirr: string) => {
-    return parseFloat(xirr.replace('%', '').replace('+', ''));
-  };
+  // const parsePercentage = (xirr: string) => {
+  //   return parseFloat(xirr.replace('%', '').replace('+', ''));
+  // };
 
-  useEffect(() => {
-    const fetchPortfolioData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        // Simulate API response with dummy data
-        const response = {
-          data: {
-            totalInvested: "₹1.2Cr",
-            overallGains: "₹28.4L (23.67%)",
-            portfolioXirr: "+15.21%",
-            benchmarkXirr: "+19.55%",
-            potentialEarnings: "₹5.47L",
-            analysisSummary: "Your portfolio shows a balanced mix with strong performers leading the growth.",
-            beta: "1.82",
-            rSquared: "0.76",
-            sharpeRatio: "1.2",
-          },
-        };
-        setPortfolioData(response.data);
-      } catch (err) {
-        setError("Failed to fetch portfolio data. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchPortfolioData = async () => {
+  //     setLoading(true);
+  //     setError(null);
+  //     try {
+  //       // Simulate API response with dummy data
+  //       const response = {
+  //         data: {
+  //           potentialEarnings: "₹5.47L",
+  //           analysisSummary: "Your portfolio shows a balanced mix with strong performers leading the growth.",
+  //           beta: "1.82",
+  //           rSquared: "0.76",
+  //           sharpeRatio: "1.2",
+  //         },
+  //       };
+  //       setPortfolioData(response.data);
+  //     } catch (err) {
+  //       setError("Failed to fetch portfolio data. Please try again later.");
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-    fetchPortfolioData();
-  }, []);
+  //   fetchPortfolioData();
+  // }, []);
 
   const [Portfoliohealth, setPortfolioHealth] = useState<any>(null);
   useEffect(() => {
@@ -161,6 +157,33 @@ const MutualFundsPage: React.FC = () => {
         fetchPortfolioStatus();
       }, []);
 
+
+      const [PortfolioXirrAnalysis, setPortfolioXirrAnalysis] = useState<any>(null);
+      useEffect(() => {
+          const fetchPortfolioStatus = async () => {
+            try {
+              const response = await fetch('http://api.inwealthera.com/api/api/portfolio/getPortfolioXirrAnalysis', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  reqId: '15043487',
+                  mobile: '+919940615334',
+                  type: 'mutual_funds',
+                }),
+              });
+              const data = await response.json();
+              setPortfolioXirrAnalysis(data);
+              console.log('Portfolio status:', data);
+            } catch (error) {
+              console.error('Error fetching portfolio status:', error);
+            }
+          };
+      
+          fetchPortfolioStatus();
+        }, []);
+
   // Calculate performance details similar to StockPortfolio
   let greaterValue = 0,
     smallerValue = 0,
@@ -169,9 +192,9 @@ const MutualFundsPage: React.FC = () => {
     smallerLabel = '';
 
 
-  if (portfolioData) {
-    const portfolioXirrNum = parsePercentage(portfolioData.portfolioXirr);
-    const benchmarkXirrNum = parsePercentage(portfolioData.benchmarkXirr);
+  if (PortfolioXirrAnalysis) {
+    const portfolioXirrNum = Number(PortfolioXirrAnalysis.portfolioXirr);
+    const benchmarkXirrNum = Number(PortfolioXirrAnalysis.benchmarkXirr);
 
     if (portfolioXirrNum >= benchmarkXirrNum) {
       greaterValue = portfolioXirrNum;
@@ -187,7 +210,7 @@ const MutualFundsPage: React.FC = () => {
     difference = greaterValue - smallerValue;
   }
 
-if (loading || !portfolioData || !Portfoliodetails || !Portfolioheader || !Portfoliohealth ) {
+if (loading || !Portfoliodetails || !Portfolioheader || !Portfoliohealth ) {
     return (
       <View style={styles.centerContainer}>
         <ActivityIndicator size="large" color="#aaaaaa" />
@@ -264,7 +287,7 @@ if (loading || !portfolioData || !Portfoliodetails || !Portfolioheader || !Portf
         <Text style={styles.title}>Mutual Funds</Text>
       </View>
 
-      {portfolioData && Portfoliodetails && Portfolioheader && Portfoliohealth && (
+      {Portfoliodetails && Portfolioheader && Portfoliohealth && (
         <>
           {/* Investment Summary */}
           <View style={styles.card}>
@@ -302,7 +325,7 @@ if (loading || !portfolioData || !Portfoliodetails || !Portfolioheader || !Portf
               </View>
             </View>
             <Text style={styles.cardNote}>
-              Your portfolio could have potentially earned {portfolioData.potentialEarnings} more with active investing
+              Your portfolio could have potentially earned {} more with active investing
             </Text>
           </View>
 
@@ -340,7 +363,7 @@ if (loading || !portfolioData || !Portfoliodetails || !Portfolioheader || !Portf
             })}
           </View>
 
-            <Text style={styles.subTitle}>{portfolioData.analysisSummary}</Text>
+            <Text style={styles.subTitle}></Text>
             <Text style={styles.subTitle}>Consider rebalancing low-performing funds to optimize returns.</Text>
           </View>
 
@@ -351,17 +374,17 @@ if (loading || !portfolioData || !Portfoliodetails || !Portfolioheader || !Portf
             </View>
             <View style={styles.metricsContainer}>
               <View style={[styles.metricCard, styles.betaCard]}>
-                <Text style={styles.metricValue}>{portfolioData.beta}</Text>
+                <Text style={styles.metricValue}>{Portfoliodetails.beta}</Text>
                 <Text style={styles.metricTitle}>Beta</Text>
                 <Text style={styles.metricSubtitle}>Volatility</Text>
               </View>
               <View style={[styles.metricCard, styles.rSquaredCard]}>
-                <Text style={styles.metricValue}>{portfolioData.rSquared}</Text>
+                <Text style={styles.metricValue}>{Portfoliodetails.rSquared}</Text>
                 <Text style={styles.metricTitle}>R-squared</Text>
                 <Text style={styles.metricSubtitle}>Correlation</Text>
               </View>
               <View style={[styles.metricCard, styles.sharpeCard]}>
-                <Text style={styles.metricValue}>{portfolioData.sharpeRatio}</Text>
+                <Text style={styles.metricValue}>{Portfoliodetails.sharpeRatio}</Text>
                 <Text style={styles.metricTitle}>Sharpe ratio</Text>
                 <Text style={styles.metricSubtitle}>Return per risk</Text>
               </View>
