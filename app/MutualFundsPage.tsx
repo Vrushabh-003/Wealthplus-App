@@ -187,10 +187,10 @@ const MutualFundsPage: React.FC = () => {
     difference = greaterValue - smallerValue;
   }
 
-  if (loading) {
+if (loading || !portfolioData || !Portfoliodetails || !Portfolioheader || !Portfoliohealth ) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#4caf50" />
+        <ActivityIndicator size="large" color="#aaaaaa" />
       </View>
     );
   }
@@ -226,27 +226,30 @@ const MutualFundsPage: React.FC = () => {
   const donutData = [
     {
       name: "Buy",
-      amount: {0},
+      amount: Number(Portfoliohealth?.Buy?.currentMktValue),
       color: "#28A745",
       legendFontColor: "#7F7F7F",
       legendFontSize: 12,
     },
     {
       name: "Hold",
-      amount: 59.0,
+      amount: Number(Portfoliohealth?.Hold?.currentMktValue),
       color: "#F57C00",
       legendFontColor: "#7F7F7F",
       legendFontSize: 12,
     },
     {
       name: "Sell",
-      amount: 7.8,
+      amount: Number(Portfoliohealth?.Sell?.currentMktValue),
       color: "#DC3545",
       legendFontColor: "#7F7F7F",
       legendFontSize: 12,
     },
   ];
   
+  const totalAmount = donutData.reduce((sum, item) => sum + item.amount, 0);
+
+ 
 
 
   return (
@@ -270,11 +273,11 @@ const MutualFundsPage: React.FC = () => {
             <View style={styles.rowContainer}>
               <View>
                 <Text style={styles.subTitle}>Total Invested</Text>
-                <Text style={styles.cardText}>{formatNumber(Portfolioheader.costValue)}</Text>
+                <Text style={styles.cardText}>₹{formatNumber(Portfolioheader.costValue)}</Text>
               </View>
               <View>
                 <Text style={styles.subTitle}>Overall Gains</Text>
-                <Text style={styles.cardText}>{(formatNumber(Portfolioheader.gainLoss))+"("+(Portfolioheader.gainLossPercentage)+")%"}</Text>
+                <Text style={styles.cardText}>₹{(formatNumber(Portfolioheader.gainLoss))+" ("+(Portfolioheader.gainLossPercentage)+")%"}</Text>
               </View>
             </View>
           </View>
@@ -314,7 +317,7 @@ const MutualFundsPage: React.FC = () => {
                 chartConfig={chartConfig}
                 accessor="amount"
                 backgroundColor="transparent"
-                paddingLeft="84"
+                paddingLeft="90"
                 absolute
                 hasLegend={false}
               />
@@ -325,13 +328,17 @@ const MutualFundsPage: React.FC = () => {
 
             {/* Legends */}
             <View style={styles.legendContainer}>
-              {donutData.map((item, index) => (
+            {donutData.map((item, index) => {
+              const percentage = totalAmount > 0 ? ((item.amount / totalAmount) * 100).toFixed(2) : "0.00";
+
+              return (
                 <View key={index} style={styles.legendItem}>
                   <View style={[styles.legendColor, { backgroundColor: item.color }]} />
-                  <Text style={styles.legendText}>{`${item.name} (${item.amount}%)`}</Text>
+                  <Text style={styles.legendText}>{`${item.name} (${percentage}%)`}</Text>
                 </View>
-              ))}
-            </View>
+              );
+            })}
+          </View>
 
             <Text style={styles.subTitle}>{portfolioData.analysisSummary}</Text>
             <Text style={styles.subTitle}>Consider rebalancing low-performing funds to optimize returns.</Text>
@@ -380,6 +387,7 @@ const styles = StyleSheet.create({
   },
   centerContainer: {
     flex: 1,
+    color: '#777777',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -479,12 +487,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   performanceText: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#2222ff',
     fontWeight: 'bold',
   },
   blockLabel: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#555',
     marginTop: 4,
   },
