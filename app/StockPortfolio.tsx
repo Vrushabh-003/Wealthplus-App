@@ -161,11 +161,11 @@ const StockPortfolio: React.FC = () => {
             <View style={styles.rowContainer}>
               <View>
                 <Text style={styles.subTitle}>Total Invested</Text>
-                <Text style={styles.cardText}>{portfolioData.totalInvested}</Text>
+                <Text style={styles.cardText}>₹{portfolioData.totalInvested}</Text>
               </View>
               <View>
                 <Text style={styles.subTitle}>Overall Gains</Text>
-                <Text style={styles.cardText}>{portfolioData.overallGains}</Text>
+                <Text style={styles.cardText}>₹{portfolioData.overallGains}</Text>
               </View>
             </View>
           </View>

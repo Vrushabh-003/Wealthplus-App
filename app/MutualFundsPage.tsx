@@ -325,7 +325,7 @@ if (loading || !Portfoliodetails || !Portfolioheader || !Portfoliohealth ) {
               </View>
             </View>
             <Text style={styles.cardNote}>
-              Your portfolio could have potentially earned {} more with active investing
+              Your portfolio could have potentially earned more with active investing
             </Text>
           </View>
 
