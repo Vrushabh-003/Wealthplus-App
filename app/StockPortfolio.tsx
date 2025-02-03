@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RouteProp } from '@react-navigation/native';
+import { RouteProp, useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { PieChart } from 'react-native-chart-kit';
+import {RootStackParamList} from './index';
+
 
 interface PortfolioData {
   totalInvested: string;
@@ -17,20 +19,22 @@ interface PortfolioData {
   sharpeRatio: string;
 }
 
-type RootStackParamList = {
-  StockPortfolio: undefined;
-  Dashboard: undefined;
-};
+// type RootStackParamList = {
+//   StockPortfolio: undefined;
+//   Dashboard: undefined;
+// };
 
-type StockPortfolioProps = {
-  navigation: NativeStackNavigationProp<RootStackParamList, 'StockPortfolio'>;
-  route: RouteProp<RootStackParamList, 'StockPortfolio'>;
-};
+// type StockPortfolioProps = {
+//   navigation: NativeStackNavigationProp<RootStackParamList, 'StockPortfolio'>;
+//   route: RouteProp<RootStackParamList, 'StockPortfolio'>;
+// };
 
-const StockPortfolio: React.FC<StockPortfolioProps> = ({ navigation }) => {
+const StockPortfolio: React.FC = () => {
   const [portfolioData, setPortfolioData] = useState<PortfolioData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  
 
   const parsePercentage = (xirr: string) => {
     return parseFloat(xirr.replace('%', '').replace('+', ''));
@@ -143,7 +147,7 @@ const StockPortfolio: React.FC<StockPortfolioProps> = ({ navigation }) => {
         <Text style={styles.logotitle}>WealthPlus</Text>
       </View>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity onPress={() => navigation.navigate('Dashboard')}>
           <Icon name="arrow-back" size={30} color="#000" />
         </TouchableOpacity>
         <Text style={styles.title}>Stocks</Text>
@@ -199,7 +203,7 @@ const StockPortfolio: React.FC<StockPortfolioProps> = ({ navigation }) => {
                 chartConfig={chartConfig}
                 accessor="amount"
                 backgroundColor="transparent"
-                paddingLeft="84"
+                paddingLeft="90"
                 absolute
                 hasLegend={false}
               />

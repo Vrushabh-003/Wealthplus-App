@@ -62,7 +62,7 @@ const MutualFundsPage: React.FC = () => {
           data: {
             totalInvested: "₹1.2Cr",
             overallGains: "₹28.4L (23.67%)",
-            portfolioXirr: "+20.21%",
+            portfolioXirr: "+15.21%",
             benchmarkXirr: "+19.55%",
             potentialEarnings: "₹5.47L",
             analysisSummary: "Your portfolio shows a balanced mix with strong performers leading the growth.",
