@@ -320,9 +320,13 @@ if (loading || !portfolioData || !Portfoliodetails || !Portfolioheader || !Portf
                 paddingLeft="90"
                 absolute
                 hasLegend={false}
+                
               />
+              
               <View style={styles.donutCenter}>
+                <TouchableOpacity onPress={() => navigation.navigate('DetailedAnalysis')}>
                 <Text style={styles.donutCenterText}>Analysis</Text>
+                </TouchableOpacity>
               </View>
             </View>
 
@@ -603,6 +607,17 @@ const styles = StyleSheet.create({
   sharpeCard: {
     backgroundColor: '#ecfdf5',
   },
+  // touchableArea: {
+  //   marginTop: 5,
+  //   backgroundColor: '#007bff',
+  //   padding: 8,
+  //   borderRadius: 5,
+  // },
+  // touchableText: {
+  //   color: '#fff',
+  //   fontSize: 14,
+  //   fontWeight: 'bold',
+  // },
 });
 
 export default MutualFundsPage;
