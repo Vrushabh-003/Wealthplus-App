@@ -12,7 +12,7 @@ import {RootStackParamList} from './index';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp, useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { PieChart } from 'react-native-chart-kit';
+import PieChart from 'react-native-pie-chart'
 
 // interface PortfolioData {
 //   totalInvested: string;
@@ -210,6 +210,12 @@ const MutualFundsPage: React.FC = () => {
     difference = greaterValue - smallerValue;
   }
 
+  const isPortfolioXirrGreaterThanBenchmark =
+  PortfolioXirrAnalysis && Number(PortfolioXirrAnalysis.portfolioXirr) > Number(PortfolioXirrAnalysis.benchmarkXirr);
+
+const isBenchmarkXirrGreaterThanPortfolio =
+  PortfolioXirrAnalysis && Number(PortfolioXirrAnalysis.benchmarkXirr) > Number(PortfolioXirrAnalysis.portfolioXirr);
+
 if (loading || !Portfoliodetails || !Portfolioheader || !Portfoliohealth ) {
     return (
       <View style={styles.centerContainer}>
@@ -269,7 +275,15 @@ if (loading || !Portfoliodetails || !Portfolioheader || !Portfoliohealth ) {
       legendFontSize: 12,
     },
   ];
+
+  //, label: { text: "SELL", offsetY: 20, offsetX: 20, fontSize: 16, fontStyle: 'italic', outline: 'white'}},
   
+
+  const series = [
+    { value: Number(Portfoliohealth?.Buy?.currentMktValue), color: '#28A745'  },
+    { value: Number(Portfoliohealth?.Hold?.currentMktValue), color: '#F57C00' },
+    { value: Number(Portfoliohealth?.Sell?.currentMktValue), color: '#DC3545'}
+  ] 
   const totalAmount = donutData.reduce((sum, item) => sum + item.amount, 0);
 
  
@@ -278,7 +292,7 @@ if (loading || !Portfoliodetails || !Portfolioheader || !Portfoliohealth ) {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.logotitle}>WealthPlus</Text>
+        <Text style={styles.logo}>Wealthplus</Text>
       </View>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.navigate('Dashboard')}>
@@ -308,6 +322,52 @@ if (loading || !Portfoliodetails || !Portfolioheader || !Portfoliohealth ) {
           {/* Performance Section (Updated to match StockPortfolio) */}
           <View style={styles.card}>
             <Text style={styles.headerText}>How did your portfolio perform?</Text>
+              {isPortfolioXirrGreaterThanBenchmark && (
+                <View style={styles.newPerformanceContainer}>
+                <View style={styles.leftBlock}>
+                  <Text style={styles.largerText}>{`+${PortfolioXirrAnalysis.portfolioXirr.toFixed(2)}%`}</Text>
+                  <Text style={styles.blockLabel}>Portfolio XIRR</Text>
+                </View>
+                <View style={styles.rightContainer}>
+                <View style={styles.topRightBlock}>
+                  <Text style={styles.performanceText}>{`+${difference.toFixed(2)}%`}</Text>
+                  <Text style={styles.blockLabel}>Difference</Text>
+                </View>
+                <View style={styles.bottomRightBlock}>
+                  <Text style={styles.performanceText}>{`${PortfolioXirrAnalysis.benchmarkXirr.toFixed(2)}%`}</Text>
+                  <Text style={styles.blockLabel}>Benchmark XIRR</Text>
+                </View>
+              </View>
+              </View>
+              )}
+              {isBenchmarkXirrGreaterThanPortfolio && (
+                <View style={styles.newPerformanceContainer}>
+                  <View style={styles.rightContainer}>
+                <View style={styles.topRightBlock}>
+                  <Text style={styles.performanceText}>{`+${difference.toFixed(2)}%`}</Text>
+                  <Text style={styles.blockLabel}>Difference</Text>
+                </View>
+                <View style={styles.bottomRightBlock}>
+                  <Text style={styles.performanceText}>{`${PortfolioXirrAnalysis.portfolioXirr.toFixed(2)}%`}</Text>
+                  <Text style={styles.blockLabel}>PortFolio XIRR</Text>
+                </View>
+              </View>
+                <View style={styles.leftBlock}>
+                  <Text style={styles.largerText}>{`+${PortfolioXirrAnalysis.benchmarkXirr.toFixed(2)}%`}</Text>
+                  <Text style={styles.blockLabel}>Benchmark XIRR</Text>
+                </View>
+                
+              </View>
+              )}
+            <Text style={styles.cardNote}>
+              Your portfolio could have potentially earned more with active investing
+            </Text>
+          </View>
+
+
+
+          {/* <View style={styles.card}>
+            <Text style={styles.headerText}>How did your portfolio perform?</Text>
             <View style={styles.newPerformanceContainer}>
               <View style={styles.leftBlock}>
                 <Text style={styles.largerText}>{`${greaterValue.toFixed(2)}%`}</Text>
@@ -327,31 +387,26 @@ if (loading || !Portfoliodetails || !Portfolioheader || !Portfoliohealth ) {
             <Text style={styles.cardNote}>
               Your portfolio could have potentially earned more with active investing
             </Text>
-          </View>
+          </View> */}
 
           {/* Analysis Section (Updated to match StockPortfolio) */}
           <View style={styles.analysisSection}>
             <Text style={styles.headerText}>Mutual Fund Analysis</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('DetailedAnalysis')}>
             <View style={styles.graphContainer}>
               <PieChart
-                data={donutData}
-                width={screenWidth * 0.9}
-                height={220}
-                chartConfig={chartConfig}
-                accessor="amount"
-                backgroundColor="transparent"
-                paddingLeft="90"
-                absolute
-                hasLegend={false}
-                
+                series={series}
+                widthAndHeight= {250}
+                cover={0.65}
               />
               
-              <View style={styles.donutCenter}>
+              {/* <View style={styles.donutCenter}>
                 <TouchableOpacity onPress={() => navigation.navigate('DetailedAnalysis')}>
                 <Text style={styles.donutCenterText}>Analysis</Text>
                 </TouchableOpacity>
-              </View>
+              </View> */}
             </View>
+            </TouchableOpacity>
 
             {/* Legends */}
             <View style={styles.legendContainer}>
@@ -432,6 +487,12 @@ const styles = StyleSheet.create({
     fontWeight: 500,
     flex: 1,
   },
+  logo: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#7D4CED",
+    textAlign: "center",
+  },
   logotitle: {
     fontSize: 28,
     color: '#3b3b3b',
@@ -492,6 +553,7 @@ const styles = StyleSheet.create({
   rightContainer: {
     flex: 1,
     justifyContent: 'space-between',
+    margin:2
   },
   topRightBlock: {
     backgroundColor: '#fef4e8',

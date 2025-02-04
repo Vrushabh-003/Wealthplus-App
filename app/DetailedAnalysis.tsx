@@ -7,7 +7,9 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { RouteProp, useNavigation } from '@react-navigation/native';
+import {RootStackParamList} from './index';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 interface Stock {
@@ -16,34 +18,65 @@ interface Stock {
   description: string;
 }
 
-interface PortfolioData {
-  Buy: Stock[];
-  Hold: Stock[];
-  Sell: Stock[];
-}
+// interface PortfolioData {
+//   Buy: Stock[];
+//   Hold: Stock[];
+//   Sell: Stock[];
+// }
 
 const DetailedAnalysis = () => {
-  const navigation = useNavigation();
-  const [portfolioData, setPortfolioData] = useState<PortfolioData | null>(null);
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  // const [portfolioData, setPortfolioData] = useState<PortfolioData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchPortfolioData = async () => {
-      try {
-        // Verify if the URL is correct.
-        const response = await fetch('http://api.inwealthera.com/api/portfolio/getPortfolioHealthDetailed');
-        const data = await response.json();
-        setPortfolioData(data);
-      } catch (err) {
-        setError('Failed to fetch data');
-      } finally {
-        setLoading(false);
-      }
-    };
+    const [PortfolioHealthDetailed, setPortfolioHealthDetailed] = useState<any>(null);
+    useEffect(() => {
+          const fetchPortfolioStatus = async () => {
+            try {
+              const response = await fetch('http://api.inwealthera.com/api/api/portfolio/getPortfolioHealthDetailed', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  reqId: '15043487',
+                  mobile: '+919940615334',
+                  type: 'mutual_funds',
+                }),
+              });
+              const data = await response.json();
+              setPortfolioHealthDetailed(data);
+              console.log('Portfolio status:', data);
+              setLoading(false);
+            } catch (error) {
+              console.error('Error fetching portfolio status:', error);
+            }
+          };
+      
+          fetchPortfolioStatus();
+        }, []);
 
-    fetchPortfolioData();
-  }, []);
+
+        // Function to format numbers into 1K, 1L, 1Cr, etc.
+  const formatNumber = (num: string) => {
+    const number = parseFloat(num);  // Convert the string to a number
+  
+    if (isNaN(number)) return "Invalid value"; // Return if it's not a valid number
+  
+    if (number >= 10000000) {
+      // For Crores (10 million and above)
+      return (number / 10000000).toFixed(2) + 'Cr'; // Keeping 2 decimals for Cr
+    } else if (number >= 100000) {
+      // For Lakhs (100 thousand and above)
+      return (number / 100000).toFixed(2) + 'L'; // Keeping 2 decimals for L
+    } else if (number >= 1000) {
+      // For Thousands
+      return (number / 1000).toFixed(2) + 'K'; // Keeping 2 decimals for K
+    } else {
+      return number.toString(); // For smaller numbers
+    }
+  };
 
   if (loading) {
     return (
@@ -64,53 +97,127 @@ const DetailedAnalysis = () => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity onPress={() => navigation.navigate('MutualFundsPage')}>
           <Icon name="arrow-back" size={30} color="#000" />
         </TouchableOpacity>
-        <Text style={styles.title}>Stock Recommendations</Text>
+        <Text style={styles.title}>Mutual Fund Recommendations</Text>
       </View>
 
       <View style={styles.sectionGood}>
-        <Text style={styles.sectionTitleGood}>BUY</Text>
-        <Text style={styles.sectionSubtitle}>Consider increasing position in these stocks</Text>
-        {portfolioData?.Buy?.map((stock, index) => (
-          <View key={index} style={styles.cardGood}>
-            <Text style={styles.stockTitle}>{stock.name}</Text>
-            <Text style={styles.stockDetail}>
-              Stock XIRR: <Text style={styles.positiveText}>{stock.xirr}%</Text>
-            </Text>
-            <Text style={styles.description}>{stock.description}</Text>
-          </View>
-        ))}
+  <Text style={styles.sectionTitleGood}>BUY</Text>
+  <Text style={styles.sectionSubtitle}>Consider increasing position in these stocks</Text>
+  {PortfolioHealthDetailed?.Buy?.map((stock: any, index: number) => (
+    <View key={index} style={styles.cardGood}>
+
+      {/* Stock Name & Market Value - Right Aligned */}
+      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        <Text style={styles.stockTitle}>{stock.schemeName}</Text>
+        <Text style={styles.stockTitle}>₹{formatNumber(stock.currentMktValue)}</Text>
       </View>
 
-      <View style={styles.sectionMonitor}>
-        <Text style={styles.sectionTitleMonitor}>HOLD</Text>
-        <Text style={styles.sectionSubtitle}>Keep these positions under observation</Text>
-        {portfolioData?.Hold?.map((stock, index) => (
-          <View key={index} style={styles.cardMonitor}>
-            <Text style={styles.stockTitle}>{stock.name}</Text>
-            <Text style={styles.stockDetail}>
-              Stock XIRR: <Text style={styles.warningText}>{stock.xirr}%</Text>
-            </Text>
-            <Text style={styles.description}>{stock.description}</Text>
-          </View>
-        ))}
+      {/* Stock XIRR & Benchmark Name with XIRR - Right Aligned */}
+      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        <View>
+          <Text style={styles.stockDetail}>
+            Stock XIRR: <Text style={styles.positiveText}>{stock.schemeXirr}%</Text>
+          </Text>
+        </View>
+        <Text style={styles.stockDetail}>
+          {stock.benchmarkName} <Text style={styles.positiveText}>{stock.benchmarkXirr}%</Text>
+      </Text>
       </View>
 
-      <View style={styles.sectionLow}>
-        <Text style={styles.sectionTitleLow}>SELL</Text>
-        <Text style={styles.sectionSubtitle}>These stocks require immediate review</Text>
-        {portfolioData?.Sell?.map((stock: any, index: number) => (
-          <View key={index} style={styles.cardLow}>
-            <Text style={styles.stockTitle}>{stock.name}</Text>
-            <Text style={styles.stockDetail}>
-              Stock XIRR: <Text style={styles.negativeText}>{stock.xirr}%</Text>
-            </Text>
-            <Text style={styles.description}>{stock.description}</Text>
-          </View>
-        ))}
+      {/* Stock Reason */}
+      <Text style={styles.description}>{stock.reason}</Text>
+
+    </View>
+  ))}
+</View>
+
+<View style={styles.sectionMonitor}>
+  <Text style={styles.sectionTitleMonitor}>HOLD</Text>
+  <Text style={styles.sectionSubtitle}>Keep these positions under observation</Text>
+  {PortfolioHealthDetailed?.Hold?.map((stock: any, index: number) => (
+    <View key={index} style={styles.cardMonitor}>
+
+      {/* Stock Name & Market Value - Right Aligned */}
+      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        <Text style={styles.stockTitle}>{stock.schemeName}</Text>
+        <Text style={styles.stockTitle}>₹{formatNumber(stock.currentMktValue)}</Text>
       </View>
+
+      {/* Stock XIRR & Benchmark Name with XIRR - Right Aligned */}
+      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        <View>
+          <Text style={styles.stockDetail}>
+            Stock XIRR: <Text style={styles.warningText}>{stock.schemeXirr}%</Text>
+          </Text>
+        </View>
+        <Text style={styles.stockDetail}>
+          {stock.benchmarkName} <Text style={styles.warningText}>{stock.benchmarkXirr}%</Text>
+      </Text>
+      </View>
+
+      {/* Stock Reason */}
+      <Text style={styles.description}>{stock.reason}</Text>
+
+    </View>
+  ))}
+</View>
+
+
+{/* <View style={styles.sectionLow}>
+  <Text style={styles.sectionTitleLow}>SELL</Text>
+  <Text style={styles.sectionSubtitle}>These stocks require immediate review</Text>
+  {PortfolioHealthDetailed?.Sell?.map((stock: any, index: number) => (
+    <View key={index} style={styles.cardLow}>
+      <Text style={styles.stockTitle}>{stock.schemeName} ₹{formatNumber(stock.currentMktValue)}</Text>
+      <Text style={styles.stockDetail}>
+        Stock XIRR: <Text style={styles.negativeText}>{stock.schemeXirr}%</Text>
+      </Text>
+      <Text style={styles.stockDetail}>
+        {stock.benchmarkName} <Text style={styles.negativeText}>{stock.benchmarkXirr}%</Text>
+      </Text>
+      <Text style={styles.description}>{stock.reason}</Text>
+    </View>
+  ))}
+</View> */}
+
+<View style={styles.sectionLow}>
+  <Text style={styles.sectionTitleLow}>SELL</Text>
+  <Text style={styles.sectionSubtitle}>These stocks require immediate review</Text>
+  {PortfolioHealthDetailed?.Sell?.map((stock: any, index: number) => (
+    <View key={index} style={styles.cardLow}>
+      
+      {/* Stock Name & Market Value - Right Aligned */}
+      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        <Text style={styles.stockTitle}>{stock.schemeName}</Text>
+        <Text style={styles.stockTitle}>₹{formatNumber(stock.currentMktValue)}</Text>
+      </View>
+      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+      {/* Stock XIRR */}
+      <View>
+      <Text style={styles.stockDetail}>
+        Stock XIRR: <Text style={styles.negativeText}>{stock.schemeXirr}%</Text>
+      </Text>
+      </View>
+
+      {/* Benchmark Name & XIRR - Right Aligned */}
+      <Text style={styles.stockDetail}>
+          {stock.benchmarkName} <Text style={styles.negativeText}>{stock.benchmarkXirr}%</Text>
+      </Text>
+
+      </View>
+
+      {/* Stock Reason */}
+      <Text style={styles.description}>{stock.reason}</Text>
+      
+    </View>
+  ))}
+</View>
+
+
+
     </ScrollView>
   );
 };
@@ -151,7 +258,7 @@ const styles = StyleSheet.create({
   },
   sectionTitleGood: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: 500,
     color: '#007F00',
   },
   sectionMonitor: {
@@ -164,7 +271,7 @@ const styles = StyleSheet.create({
   },
   sectionTitleMonitor: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: 500,
     color: '#D97706',
   },
   sectionLow: {
@@ -177,7 +284,7 @@ const styles = StyleSheet.create({
   },
   sectionTitleLow: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: 500,
     color: '#D32F2F',
   },
   cardGood: {
