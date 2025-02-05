@@ -1,8 +1,10 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View,ScrollView, Text, StyleSheet, TouchableOpacity, BackHandler,  Alert } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { RootStackParamList } from './index'; // Adjust the import path as needed
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 // Define the navigation prop type
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Dashboard'>;
@@ -13,31 +15,72 @@ const Dashboard = () => {
   const [data, setData] = React.useState();
   const [Portfoliostatus, setPortfolioStatus] = React.useState();
 
-  //API integration
-  useEffect(() => {
-    const fetchPortfolioStatus = async () => {
-      try {
-        const response = await fetch('http://api.inwealthera.com/api/portfolio/getPortfolioAnalysisReadyStatus', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            reqId: '15043487',
-            mobile: '+919940615334',
-            type: 'mutual_funds',
-          }),
-        });
-        const data = await response.json();
-        setPortfolioStatus(data);
-        console.log('Portfolio status:', data);
-      } catch (error) {
-        console.error('Error fetching portfolio status:', error);
-      }
-    };
+  const [Portfoliohealth, setPortfolioHealth] = useState<any>(null);
+  const [Portfoliodetails, setPortfolioDetails] = useState<any>(null);
+  const [Portfolioheader, setPortfolioHeader] = useState<any>(null);
+  const [PortfolioXirrAnalysis, setPortfolioXirrAnalysis] = useState<any>(null);
+  const fetchData = async () => {
+    const portfolioXirrAnalysis = await AsyncStorage.getItem('MFPortfolioXirrAnalysis');
+    const portfolioHeader = await AsyncStorage.getItem('MFPortfolioheader');
+    const portfolioDetails = await AsyncStorage.getItem('MFPortfoliodetails');
+    const portfolioHealth = await AsyncStorage.getItem('MFPortfoliohealth');
+  
+    setPortfolioXirrAnalysis(portfolioXirrAnalysis ? JSON.parse(portfolioXirrAnalysis) : {});
+    setPortfolioHeader(portfolioHeader ? JSON.parse(portfolioHeader) : {});
+    setPortfolioDetails(portfolioDetails ? JSON.parse(portfolioDetails) : {});
+    setPortfolioHealth(portfolioHealth ? JSON.parse(portfolioHealth) : {});
 
-    fetchPortfolioStatus();
+    console.log(Portfoliohealth, Portfolioheader, Portfoliodetails,PortfolioXirrAnalysis);
+  };
+  
+  useEffect(() => {
+    fetchData();
   }, []);
+
+  //API integration
+  // useEffect(() => {
+  //   const fetchPortfolioStatus = async () => {
+  //     try {
+  //       const response = await fetch('http://api.inwealthera.com/api/portfolio/getPortfolioAnalysisReadyStatus', {
+  //         method: 'POST',
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //         },
+  //         body: JSON.stringify({
+  //           reqId: '15043487',
+  //           mobile: '+919940615334',
+  //           type: 'mutual_funds',
+  //         }),
+  //       });
+  //       const data = await response.json();
+  //       setPortfolioStatus(data);
+  //       console.log('Portfolio status:', data);
+  //     } catch (error) {
+  //       console.error('Error fetching portfolio status:', error);
+  //     }
+  //   };
+
+  //   fetchPortfolioStatus();
+  // }, []);
+
+  const formatNumber = (num: string) => {
+    const number = parseFloat(num);  // Convert the string to a number
+  
+    if (isNaN(number)) return "Invalid value"; // Return if it's not a valid number
+  
+    if (number >= 10000000) {
+      // For Crores (10 million and above)
+      return (number / 10000000).toFixed(2) + 'Cr'; // Keeping 2 decimals for Cr
+    } else if (number >= 100000) {
+      // For Lakhs (100 thousand and above)
+      return (number / 100000).toFixed(2) + 'L'; // Keeping 2 decimals for L
+    } else if (number >= 1000) {
+      // For Thousands
+      return (number / 1000).toFixed(2) + 'K'; // Keeping 2 decimals for K
+    } else {
+      return number.toString(); // For smaller numbers
+    }
+  };
 
 
 
@@ -70,23 +113,23 @@ const Dashboard = () => {
       {/* Portfolio Overview */}
       <View style={styles.portfolio}>
         <Text style={styles.assetsText}>Your Assets</Text>
-        <Text style={styles.totalAssets}>₹2.43Cr</Text>
+        <Text style={styles.totalAssets}>₹{formatNumber(Portfolioheader.currentMktValue)}</Text>
 
         <View style={styles.rowContainer}>
           <View style={styles.gainsContainer}>
               <Text style={styles.subText}>Total Invested</Text>
-              <Text style={styles.amount}>₹1.89Cr</Text>
+              <Text style={styles.amount}>₹{formatNumber(Portfolioheader.costValue)}</Text>
           </View> 
           <View style={styles.gainsContainer}>
               <Text style={styles.gainsLabel}>Overall Gains</Text>
-              <Text style={styles.gains}>₹54L (28.5%)</Text>
+              <Text style={styles.gains}>₹{(formatNumber(Portfolioheader.gainLoss))+" ("+(Portfolioheader.gainLossPercentage)+")%"}</Text>
           </View>
         </View>
         {/* Portfolio XIRR and Overall Gains in a row */}
         <View style={styles.rowContainer}>
           <View>
             <Text style={styles.subText}>Portfolio XIRR</Text>
-            <Text style={styles.xirr}>21.2%</Text>
+            <Text style={styles.xirr}>{`+${PortfolioXirrAnalysis.portfolioXirr.toFixed(2)}%`}</Text>
           </View>
           
         </View>

@@ -11,6 +11,8 @@ import { RouteProp, useNavigation } from '@react-navigation/native';
 import {RootStackParamList} from './index';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Icon from 'react-native-vector-icons/Ionicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 interface Stock {
   name: string;
@@ -31,31 +33,43 @@ const DetailedAnalysis = () => {
   const [error, setError] = useState<string | null>(null);
 
     const [PortfolioHealthDetailed, setPortfolioHealthDetailed] = useState<any>(null);
-    useEffect(() => {
-          const fetchPortfolioStatus = async () => {
-            try {
-              const response = await fetch('http://api.inwealthera.com/api/api/portfolio/getPortfolioHealthDetailed', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  reqId: '15043487',
-                  mobile: '+919940615334',
-                  type: 'mutual_funds',
-                }),
-              });
-              const data = await response.json();
-              setPortfolioHealthDetailed(data);
-              console.log('Portfolio status:', data);
-              setLoading(false);
-            } catch (error) {
-              console.error('Error fetching portfolio status:', error);
-            }
-          };
+    
+
+    const fetchData = async () => {
+      const portfolioHealthDetailed = await AsyncStorage.getItem('MFPortfolioHealthDetailed');
+      console.log('Fetched Data from AsyncStorage:', portfolioHealthDetailed); // Log data
+      setPortfolioHealthDetailed(portfolioHealthDetailed ? JSON.parse(portfolioHealthDetailed) : {});
+   };
+
+     useEffect(() => {
+       fetchData();
+     }, []);
+   
+    // useEffect(() => {
+    //       const fetchPortfolioStatus = async () => {
+    //         try {
+    //           const response = await fetch('http://api.inwealthera.com/api/api/portfolio/getPortfolioHealthDetailed', {
+    //             method: 'POST',
+    //             headers: {
+    //               'Content-Type': 'application/json',
+    //             },
+    //             body: JSON.stringify({
+    //               reqId: '15043487',
+    //               mobile: '+919940615334',
+    //               type: 'mutual_funds',
+    //             }),
+    //           });
+    //           const data = await response.json();
+    //           setPortfolioHealthDetailed(data);
+    //           console.log('Portfolio status:', data);
+    //           setLoading(false);
+    //         } catch (error) {
+    //           console.error('Error fetching portfolio status:', error);
+    //         }
+    //       };
       
-          fetchPortfolioStatus();
-        }, []);
+    //       fetchPortfolioStatus();
+    //     }, []);
 
 
         // Function to format numbers into 1K, 1L, 1Cr, etc.
@@ -78,13 +92,13 @@ const DetailedAnalysis = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#007F00" />
-      </View>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <View style={styles.loadingContainer}>
+  //       <ActivityIndicator size="large" color="#007F00" />
+  //     </View>
+  //   );
+  // }
 
   if (error) {
     return (

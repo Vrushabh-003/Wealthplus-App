@@ -1,35 +1,125 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { RootStackParamList } from "./index";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, "PhoneNumberScreen">;
 
 const VerifiedScreen = () => {
   const navigation = useNavigation<NavigationProp>();
+  const [loading, setLoading] = useState(true);
+
+  const [portfolioData, setPortfolioData] = useState({
+    health: null,
+    header: null,
+    details: null,
+    xirrAnalysis: null,
+    healthdetailed: null
+  });
 
   useEffect(() => {
-    // Set a timeout to navigate to the Dashboard screen after 3 seconds
-    const timer = setTimeout(() => {
-      navigation.navigate("Dashboard");
-    }, 1000); // 1000 milliseconds = 1 seconds
+    const fetchPortfolioData = async () => {
+      try {
+        const responses = await Promise.all([
+          fetch('http://api.inwealthera.com/api/portfolio/getPortfolioHealth', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              reqId: '15043487',
+              mobile: '+919940615334',
+              type: 'mutual_funds',
+            }),
+          }),
+          fetch('http://api.inwealthera.com/api/portfolio/getPortfolioHeader', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              reqId: '15043487',
+              mobile: '+919940615334',
+              type: 'mutual_funds',
+            }),
+          }),
+          fetch('http://api.inwealthera.com/api/portfolio/getPortfolioDetails', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              reqId: '15043487',
+              mobile: '+919940615334',
+              type: 'mutual_funds',
+            }),
+          }),
+          fetch('http://api.inwealthera.com/api/api/portfolio/getPortfolioXirrAnalysis', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              reqId: '15043487',
+              mobile: '+919940615334',
+              type: 'mutual_funds',
+            }),
+          }),
+          fetch('http://api.inwealthera.com/api/api/portfolio/getPortfolioHealthDetailed', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              reqId: '15043487',
+              mobile: '+919940615334',
+              type: 'mutual_funds',
+            }),
+          }),
+        ]);
 
-    // Clear the timeout if the component is unmounted
-    return () => clearTimeout(timer);
-  }, [navigation]);
+        const [health, header, details, xirrAnalysis, healthdetailed] = await Promise.all(
+          responses.map((res) => res.json())
+        );
+
+
+
+        setPortfolioData({ health, header, details, xirrAnalysis ,healthdetailed});
+        console.log('Portfolio data:', { health, header, details, xirrAnalysis, healthdetailed });
+        setLoading(false);
+        
+        // Save data to AsyncStorage
+        await AsyncStorage.setItem('MFPortfoliodetails', JSON.stringify(details));
+        await AsyncStorage.setItem('MFPortfolioheader', JSON.stringify(header));
+        await AsyncStorage.setItem('MFPortfoliohealth', JSON.stringify(health));
+        await AsyncStorage.setItem('MFPortfolioXirrAnalysis', JSON.stringify(xirrAnalysis));
+        await AsyncStorage.setItem('MFPortfolioHealthDetailed', JSON.stringify(healthdetailed));
+
+      } catch (error) {
+        console.error('Error fetching portfolio data:', error);
+        setLoading(false); // Stop loading even if there's an error
+      }
+    };
+
+    fetchPortfolioData();
+  }, []);
+
+  useEffect(() => {
+    if (!loading) {
+      const timer = setTimeout(() => {
+        navigation.navigate("Dashboard");
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [loading, navigation]);
+
+  if (loading) {
+    return (
+      <View style={styles.centerContainer}>
+        <ActivityIndicator size="large" color="#aaaaaa" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      {/* Logo */}
       <Text style={styles.logo}>WealthPlus</Text>
-
-      {/* Progress Bar */}
       <View style={styles.progressBarContainer}>
         <View style={styles.progressBar} />
       </View>
-
-      {/* Tick mark and Verification message */}
       <View style={styles.verificationContainer}>
         <Text style={styles.tickMark}>✔</Text>
         <Text style={styles.verificationText}>Verification Complete!</Text>
@@ -50,7 +140,7 @@ const styles = StyleSheet.create({
   logo: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#4CAF50', // Green color
+    color: '#4CAF50',
     marginBottom: 40,
   },
   progressBarContainer: {
@@ -64,7 +154,7 @@ const styles = StyleSheet.create({
   progressBar: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#4CAF50', // Green color for the progress bar
+    backgroundColor: '#4CAF50',
   },
   verificationContainer: {
     alignItems: 'center',
@@ -72,7 +162,7 @@ const styles = StyleSheet.create({
   },
   tickMark: {
     fontSize: 50,
-    color: '#4CAF50', // Green color for the tick mark
+    color: '#4CAF50',
   },
   verificationText: {
     fontSize: 20,
@@ -84,6 +174,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#888888',
     marginTop: 10,
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    color: '#ffffff'
   },
 });
 
