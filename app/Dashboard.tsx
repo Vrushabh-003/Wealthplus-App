@@ -144,8 +144,8 @@ const Dashboard = () => {
       >
         <Text style={styles.sectionTitle}>📅 Mutual Funds</Text>
         <Text style={styles.sectionSubtitle}>19 Funds</Text>
-        <Text style={styles.amountRight}>₹1.61Cr</Text>
-        <Text style={styles.performancePositive}>₹10L of outperformance vs benchmark</Text>
+        <Text style={styles.amountRight}>₹{formatNumber(Portfolioheader.currentMktValue)}</Text>
+        <Text style={styles.performancePositive}>₹{(formatNumber(Portfolioheader.gainLoss))} of outperformance vs benchmark</Text>
         
       </TouchableOpacity>
 

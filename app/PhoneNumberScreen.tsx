@@ -4,6 +4,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Animated } from "r
 import { RootStackParamList } from "./index";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
+
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, "PhoneNumberScreen">;
 
 const PhoneNumberScreen = () => {

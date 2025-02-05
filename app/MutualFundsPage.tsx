@@ -344,74 +344,110 @@ if (loading || !Portfoliodetails || !Portfolioheader || !Portfoliohealth ) {
           </View>
 
           {/* Performance Section (Updated to match StockPortfolio) */}
-          <View style={styles.card}>
-            <Text style={styles.headerText}>How did your portfolio perform?</Text>
-              {isPortfolioXirrGreaterThanBenchmark && (
-                <View style={styles.newPerformanceContainer}>
-                <View style={styles.leftBlock}>
-                  <Text style={styles.largerText}>{`+${PortfolioXirrAnalysis.portfolioXirr.toFixed(2)}%`}</Text>
-                  <Text style={styles.blockLabel}>Portfolio XIRR</Text>
-                </View>
-                <View style={styles.rightContainer}>
-                <View style={styles.topRightBlock}>
-                  <Text style={styles.performanceText}>{`+${difference.toFixed(2)}%`}</Text>
-                  <Text style={styles.blockLabel}>Difference</Text>
-                </View>
-                <View style={styles.bottomRightBlock}>
-                  <Text style={styles.performanceText}>{`${PortfolioXirrAnalysis.benchmarkXirr.toFixed(2)}%`}</Text>
-                  <Text style={styles.blockLabel}>Benchmark XIRR</Text>
-                </View>
-              </View>
-              </View>
-              )}
-              {isBenchmarkXirrGreaterThanPortfolio && (
-                <View style={styles.newPerformanceContainer}>
-                  <View style={styles.rightContainer}>
-                <View style={styles.topRightBlock}>
-                  <Text style={styles.performanceText}>{`+${difference.toFixed(2)}%`}</Text>
-                  <Text style={styles.blockLabel}>Difference</Text>
-                </View>
-                <View style={styles.bottomRightBlock}>
-                  <Text style={styles.performanceText}>{`${PortfolioXirrAnalysis.portfolioXirr.toFixed(2)}%`}</Text>
-                  <Text style={styles.blockLabel}>PortFolio XIRR</Text>
-                </View>
-              </View>
-                <View style={styles.leftBlock}>
-                  <Text style={styles.largerText}>{`+${PortfolioXirrAnalysis.benchmarkXirr.toFixed(2)}%`}</Text>
-                  <Text style={styles.blockLabel}>Benchmark XIRR</Text>
-                </View>
-                
-              </View>
-              )}
-            <Text style={styles.cardNote}>
-              Your portfolio could have potentially earned more with active investing
-            </Text>
-          </View>
+
+          
+
+          
+         
+     
+
+<View style={styles.card}>
+  <Text style={styles.headerText}>How did your portfolio perform?</Text>
+
+  {isPortfolioXirrGreaterThanBenchmark && (
+    <View style={styles.newPerformanceContainer}>
+      <View style={styles.leftBlock}>
+        <Text style={styles.largerText}>{`+${PortfolioXirrAnalysis.portfolioXirr.toFixed(2)}%`}</Text>
+        <Text style={styles.blockLabel}>Portfolio XIRR</Text>
+      </View>
+
+      <View style={styles.rightContainer}>
+        {/* Difference container */}
+        <View
+          style={[
+            styles.topRightBlock,
+            {
+              height: Math.max(30, (difference / Math.max(difference, PortfolioXirrAnalysis.portfolioXirr, PortfolioXirrAnalysis.benchmarkXirr)) * 100), // Ensure min height is 30 units
+            },
+          ]}
+        >
+          <Text style={styles.performanceText}>{`+${difference.toFixed(2)}%`}</Text>
+          <Text style={styles.blockLabel}>Difference</Text>
+        </View>
+
+        {/* Portfolio XIRR container */}
+        <View
+          style={[
+            styles.bottomRightBlock,
+            {
+              height: Math.max(30, (PortfolioXirrAnalysis.portfolioXirr / Math.max(difference, PortfolioXirrAnalysis.portfolioXirr, PortfolioXirrAnalysis.benchmarkXirr)) * 100), // Ensure min height is 30 units
+            },
+          ]}
+        >
+          <Text style={styles.performanceText}>{`${PortfolioXirrAnalysis.portfolioXirr.toFixed(2)}%`}</Text>
+          <Text style={styles.blockLabel}>Portfolio XIRR</Text>
+        </View>
+
+        {/* Benchmark XIRR container */}
+        <View
+          style={[
+            styles.bottomRightBlock,
+            {
+              height: Math.max(30, (PortfolioXirrAnalysis.benchmarkXirr / Math.max(difference, PortfolioXirrAnalysis.portfolioXirr, PortfolioXirrAnalysis.benchmarkXirr)) * 100), // Ensure min height is 30 units
+            },
+          ]}
+        >
+          <Text style={styles.performanceText}>{`${PortfolioXirrAnalysis.benchmarkXirr.toFixed(2)}%`}</Text>
+          <Text style={styles.blockLabel}>Benchmark XIRR</Text>
+        </View>
+      </View>
+    </View>
+  )}
+
+  {isBenchmarkXirrGreaterThanPortfolio && (
+    <View style={styles.newPerformanceContainer}>
+      <View style={styles.rightContainer}>
+        {/* Difference container */}
+        <View
+          style={[
+            styles.topRightBlock,
+            {
+              height: Math.max(30, (difference / Math.max(difference, PortfolioXirrAnalysis.portfolioXirr, PortfolioXirrAnalysis.benchmarkXirr)) * 100), // Ensure min height is 30 units
+            },
+          ]}
+        >
+          <Text style={styles.performanceText}>{`+${difference.toFixed(2)}%`}</Text>
+          <Text style={styles.blockLabel}>Difference</Text>
+        </View>
+
+        {/* Portfolio XIRR container */}
+        <View
+          style={[
+            styles.bottomRightBlock,
+            {
+              height: Math.max(30, (PortfolioXirrAnalysis.portfolioXirr / Math.max(difference, PortfolioXirrAnalysis.portfolioXirr, PortfolioXirrAnalysis.benchmarkXirr)) * 100), // Ensure min height is 30 units
+            },
+          ]}
+        >
+          <Text style={styles.performanceText}>{`${PortfolioXirrAnalysis.portfolioXirr.toFixed(2)}%`}</Text>
+          <Text style={styles.blockLabel}>Portfolio XIRR</Text>
+        </View>
+      </View>
+
+      <View style={styles.leftBlock}>
+        <Text style={styles.largerText}>{`+${PortfolioXirrAnalysis.benchmarkXirr.toFixed(2)}%`}</Text>
+        <Text style={styles.blockLabel}>Benchmark XIRR</Text>
+      </View>
+    </View>
+  )}
+
+  <Text style={styles.cardNote}>
+    Your portfolio could have potentially earned more with active investing
+  </Text>
+</View>
 
 
 
-          {/* <View style={styles.card}>
-            <Text style={styles.headerText}>How did your portfolio perform?</Text>
-            <View style={styles.newPerformanceContainer}>
-              <View style={styles.leftBlock}>
-                <Text style={styles.largerText}>{`${greaterValue.toFixed(2)}%`}</Text>
-                <Text style={styles.blockLabel}>{greaterLabel}</Text>
-              </View>
-              <View style={styles.rightContainer}>
-                <View style={styles.topRightBlock}>
-                  <Text style={styles.performanceText}>{`+${difference.toFixed(2)}%`}</Text>
-                  <Text style={styles.blockLabel}>Difference</Text>
-                </View>
-                <View style={styles.bottomRightBlock}>
-                  <Text style={styles.performanceText}>{`${smallerValue.toFixed(2)}%`}</Text>
-                  <Text style={styles.blockLabel}>{smallerLabel}</Text>
-                </View>
-              </View>
-            </View>
-            <Text style={styles.cardNote}>
-              Your portfolio could have potentially earned more with active investing
-            </Text>
-          </View> */}
 
           {/* Analysis Section (Updated to match StockPortfolio) */}
           <View style={styles.analysisSection}>
