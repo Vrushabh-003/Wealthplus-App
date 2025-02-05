@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View,ScrollView, Text, StyleSheet, TouchableOpacity, BackHandler,  Alert } from 'react-native';
+import { View,ScrollView, Text, StyleSheet, TouchableOpacity, BackHandler,  Alert, ActivityIndicator } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { RootStackParamList } from './index'; // Adjust the import path as needed
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -13,6 +13,7 @@ const Dashboard = () => {
   // Use the correct navigation prop type
   const navigation = useNavigation<NavigationProp>();
   const [data, setData] = React.useState();
+  const [loading, setLoading] = useState(true);
   const [Portfoliostatus, setPortfolioStatus] = React.useState();
 
   const [Portfoliohealth, setPortfolioHealth] = useState<any>(null);
@@ -20,48 +21,38 @@ const Dashboard = () => {
   const [Portfolioheader, setPortfolioHeader] = useState<any>(null);
   const [PortfolioXirrAnalysis, setPortfolioXirrAnalysis] = useState<any>(null);
   const fetchData = async () => {
-    const portfolioXirrAnalysis = await AsyncStorage.getItem('MFPortfolioXirrAnalysis');
-    const portfolioHeader = await AsyncStorage.getItem('MFPortfolioheader');
-    const portfolioDetails = await AsyncStorage.getItem('MFPortfoliodetails');
-    const portfolioHealth = await AsyncStorage.getItem('MFPortfoliohealth');
+    try {
+      const portfolioXirrAnalysis = await AsyncStorage.getItem('MFPortfolioXirrAnalysis');
+      const portfolioHeader = await AsyncStorage.getItem('MFPortfolioheader');
+      const portfolioDetails = await AsyncStorage.getItem('MFPortfoliodetails');
+      const portfolioHealth = await AsyncStorage.getItem('MFPortfoliohealth');
   
-    setPortfolioXirrAnalysis(portfolioXirrAnalysis ? JSON.parse(portfolioXirrAnalysis) : {});
-    setPortfolioHeader(portfolioHeader ? JSON.parse(portfolioHeader) : {});
-    setPortfolioDetails(portfolioDetails ? JSON.parse(portfolioDetails) : {});
-    setPortfolioHealth(portfolioHealth ? JSON.parse(portfolioHealth) : {});
-
-    console.log(Portfoliohealth, Portfolioheader, Portfoliodetails,PortfolioXirrAnalysis);
+      console.log('Fetched Data:', { portfolioXirrAnalysis, portfolioHeader, portfolioDetails, portfolioHealth });
+  
+      // Check if data is valid before updating state
+      const parsedXirr = portfolioXirrAnalysis ? JSON.parse(portfolioXirrAnalysis) : {};
+      const parsedHeader = portfolioHeader ? JSON.parse(portfolioHeader) : {};
+      const parsedDetails = portfolioDetails ? JSON.parse(portfolioDetails) : {};
+      const parsedHealth = portfolioHealth ? JSON.parse(portfolioHealth) : {};
+  
+      console.log('Parsed Data:', { parsedXirr, parsedHeader, parsedDetails, parsedHealth });
+  
+      // Update state only if parsed data is valid
+      setPortfolioXirrAnalysis(parsedXirr);
+      setPortfolioHeader(parsedHeader);
+      setPortfolioDetails(parsedDetails);
+      setPortfolioHealth(parsedHealth);
+  
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching data from AsyncStorage:', error);
+      setLoading(false);  // Ensure loading is stopped even in case of error
+    }
   };
   
-  useEffect(() => {
-    fetchData();
-  }, []);
+  
+  
 
-  //API integration
-  // useEffect(() => {
-  //   const fetchPortfolioStatus = async () => {
-  //     try {
-  //       const response = await fetch('http://api.inwealthera.com/api/portfolio/getPortfolioAnalysisReadyStatus', {
-  //         method: 'POST',
-  //         headers: {
-  //           'Content-Type': 'application/json',
-  //         },
-  //         body: JSON.stringify({
-  //           reqId: '15043487',
-  //           mobile: '+919940615334',
-  //           type: 'mutual_funds',
-  //         }),
-  //       });
-  //       const data = await response.json();
-  //       setPortfolioStatus(data);
-  //       console.log('Portfolio status:', data);
-  //     } catch (error) {
-  //       console.error('Error fetching portfolio status:', error);
-  //     }
-  //   };
-
-  //   fetchPortfolioStatus();
-  // }, []);
 
   const formatNumber = (num: string) => {
     const number = parseFloat(num);  // Convert the string to a number
@@ -83,7 +74,9 @@ const Dashboard = () => {
   };
 
 
-
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
@@ -99,6 +92,15 @@ const Dashboard = () => {
       return () => backHandler.remove();
     }, [])
   );
+
+  if (loading){
+    return(
+      <View style={styles.centerContainer}>
+              <ActivityIndicator size="large" color="#aaaaaa" />
+      </View>
+
+    );
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -164,6 +166,7 @@ const Dashboard = () => {
         <Text style={styles.healthPoint}>✅ Consistent outperformance vs benchmark</Text>
       </View>
     </ScrollView>
+    
   );
 };
 
@@ -244,6 +247,12 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 14,
     color: '#777',
+  },
+  centerContainer: {
+    flex: 1,
+    color: '#777777',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   gains: {
     fontSize: 18,
