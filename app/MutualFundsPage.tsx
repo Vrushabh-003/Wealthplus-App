@@ -307,21 +307,21 @@ if (loading || !Portfoliodetails || !Portfolioheader || !Portfoliohealth ) {
 
   const donutData = [
     {
-      name: "Buy",
+      name: "Buy\n₹"+formatNumber(Portfoliohealth?.Buy?.currentMktValue)+" ("+Portfoliohealth?.Buy?.fundCount+' funds)',
       amount: Number(Portfoliohealth?.Buy?.currentMktValue),
       color: "#28A745",
       legendFontColor: "#7F7F7F",
       legendFontSize: 12,
     },
     {
-      name: "Hold",
+      name: "Hold\n₹"+formatNumber(Portfoliohealth?.Hold?.currentMktValue)+"\n("+Portfoliohealth?.Hold?.fundCount+' funds)',
       amount: Number(Portfoliohealth?.Hold?.currentMktValue),
       color: "#F57C00",
       legendFontColor: "#7F7F7F",
       legendFontSize: 12,
     },
     {
-      name: "Sell",
+      name: "Sell\n₹"+formatNumber(Portfoliohealth?.Sell?.currentMktValue)+"\n("+Portfoliohealth?.Sell?.fundCount+' funds)',
       amount: Number(Portfoliohealth?.Sell?.currentMktValue),
       color: "#DC3545",
       legendFontColor: "#7F7F7F",
@@ -361,6 +361,8 @@ if (loading || !Portfoliodetails || !Portfolioheader || !Portfoliohealth ) {
   //   return { clampedX, clampedY };
   // };
 
+  const mfdiff=(difference/100)*Portfolioheader.currentMktValue
+
  
  
 
@@ -382,6 +384,7 @@ if (loading || !Portfoliodetails || !Portfolioheader || !Portfoliohealth ) {
           {/* Investment Summary */}
           <View style={styles.card}>
             <Text style={styles.subTitle}>Updated as of {Portfolioheader.navDate}</Text>
+            <Text style={styles.subTitle}>Current Value</Text>
             <Text style={styles.cardTitle}>₹{formatNumber(Portfolioheader.currentMktValue)}</Text>
             <View style={styles.rowContainer}>
               <View>
@@ -427,7 +430,7 @@ if (loading || !Portfoliodetails || !Portfolioheader || !Portfoliohealth ) {
         {/* Difference Container */}
         <View
           style={[
-            styles.topRightBlock,
+            styles.topRightBlockp,
             {
               height: Math.max(
                 40,
@@ -487,7 +490,7 @@ if (loading || !Portfoliodetails || !Portfolioheader || !Portfoliohealth ) {
         {/* Difference Container */}
         <View
           style={[
-            styles.topRightBlock,
+            styles.topRightBlockn,
             {
               height: Math.max(
                 40,
@@ -553,12 +556,12 @@ if (loading || !Portfoliodetails || !Portfolioheader || !Portfoliohealth ) {
     ) }
   {isBenchmarkXirrGreaterThanPortfolio && (
     <Text style={styles.negativecardNote}>
-    Your portfolio could have potentially earned more with active investing
+    Your portfolio could have potentially earned more ₹{formatNumber(String(mfdiff))} with active investing
   </Text> 
   )}
   {isPortfolioXirrGreaterThanBenchmark && (
     <Text style={styles.positivecardNote}>
-    Your portfolio have earned more than Benchmark XIRR
+    Your portfolio have earned ₹{formatNumber(String(mfdiff))} more than Benchmark XIRR
   </Text> 
   )}
   
@@ -606,6 +609,10 @@ if (loading || !Portfoliodetails || !Portfolioheader || !Portfoliohealth ) {
       const centerY = 125; // Half of widthAndHeight (250 / 2)
       const topPosition = centerY + y - 10; // Adjust for text height
       const leftPosition = centerX + x - 10; // Adjust for text width
+
+      if (item.amount==0){
+        return null;
+      }
 
       return (
         <Text
@@ -760,8 +767,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     margin:2
   },
-  topRightBlock: {
-    backgroundColor: '#fef4e8',
+  topRightBlockp: {
+    backgroundColor: '#22ff2266',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+    marginBottom: 5,
+  },
+  topRightBlockn: {
+    backgroundColor: '#E3071D27',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,

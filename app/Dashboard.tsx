@@ -108,6 +108,31 @@ const Dashboard = () => {
   const isBenchmarkXirrGreaterThanPortfolio =
   PortfolioXirrAnalysis && Number(PortfolioXirrAnalysis.benchmarkXirr) > Number(PortfolioXirrAnalysis.portfolioXirr);
 
+  let greaterValue = 0,
+  smallerValue = 0,
+  difference = 0,
+  greaterLabel = '',
+  smallerLabel = '';
+
+  if (PortfolioXirrAnalysis) {
+    const portfolioXirrNum = Number(PortfolioXirrAnalysis.portfolioXirr);
+    const benchmarkXirrNum = Number(PortfolioXirrAnalysis.benchmarkXirr);
+
+    if (portfolioXirrNum >= benchmarkXirrNum) {
+      greaterValue = portfolioXirrNum;
+      smallerValue = benchmarkXirrNum;
+      greaterLabel = "Portfolio XIRR";
+      smallerLabel = "Benchmark XIRR";
+    } else {
+      greaterValue = benchmarkXirrNum;
+      smallerValue = portfolioXirrNum;
+      greaterLabel = "Benchmark XIRR";
+      smallerLabel = "Portfolio XIRR";
+    }
+    difference = greaterValue - smallerValue;
+  }
+
+  const mfdiff=(difference/100)*Portfolioheader.currentMktValue
 
   return (
     <ScrollView style={styles.container}>
@@ -153,8 +178,8 @@ const Dashboard = () => {
         <Text style={styles.sectionSubtitle}>19 Funds</Text>
         <Text style={styles.amountRight}>₹{formatNumber(Portfolioheader.currentMktValue)}</Text>
 
-{  isPortfolioXirrGreaterThanBenchmark &&      (<Text style={styles.performancePositive}>₹{(formatNumber(Portfolioheader.gainLoss))} of outperformance vs benchmark</Text>)}        
-{  isBenchmarkXirrGreaterThanPortfolio &&      (<Text style={styles.performanceNegative}>₹{(formatNumber(Portfolioheader.gainLoss))} of underperformance vs benchmark</Text>)}        
+{  isPortfolioXirrGreaterThanBenchmark &&      (<Text style={styles.performancePositive}>₹{(formatNumber(String(mfdiff)))} of outperformance vs benchmark</Text>)}        
+{  isBenchmarkXirrGreaterThanPortfolio &&      (<Text style={styles.performanceNegative}>₹{(formatNumber(String(mfdiff)))} of underperformance vs benchmark</Text>)}        
     
       </TouchableOpacity>
 
