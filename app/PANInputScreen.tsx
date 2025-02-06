@@ -9,7 +9,7 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList, "PhoneNumber
 const PANInputScreen = () => {
   const navigation = useNavigation<NavigationProp>(); // Use the NavigationProp type here
 
-  const [panNumber, setPanNumber] = useState("");
+  const [panNumber, setPanNumber] = useState("ABCDE1234H");
   const [progress, setProgress] = useState(new Animated.Value(0));
 
   useEffect(() => {

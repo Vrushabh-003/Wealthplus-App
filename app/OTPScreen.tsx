@@ -8,7 +8,7 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList, "OTPScreen">
 
 const OTPScreen = () => {
   const navigation = useNavigation<NavigationProp>();
-  const [otp, setOtp] = useState('');
+  const [otp, setOtp] = useState('123456');
   const [progress, setProgress] = useState(new Animated.Value(0));
   // const navigation = useNavigation();
 

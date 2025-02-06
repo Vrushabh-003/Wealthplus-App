@@ -9,7 +9,7 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList, "PhoneNumber
 
 const PhoneNumberScreen = () => {
   const Navigation = useNavigation<NavigationProp>();
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("9940615334");
   const [progress, setProgress] = useState(new Animated.Value(0));
   const navigation = useNavigation();
   

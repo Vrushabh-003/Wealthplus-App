@@ -101,6 +101,13 @@ const Dashboard = () => {
 
     );
   }
+  
+  const isPortfolioXirrGreaterThanBenchmark =
+  PortfolioXirrAnalysis && Number(PortfolioXirrAnalysis.portfolioXirr) > Number(PortfolioXirrAnalysis.benchmarkXirr);
+
+  const isBenchmarkXirrGreaterThanPortfolio =
+  PortfolioXirrAnalysis && Number(PortfolioXirrAnalysis.benchmarkXirr) > Number(PortfolioXirrAnalysis.portfolioXirr);
+
 
   return (
     <ScrollView style={styles.container}>
@@ -145,8 +152,10 @@ const Dashboard = () => {
         <Text style={styles.sectionTitle}>📅 Mutual Funds</Text>
         <Text style={styles.sectionSubtitle}>19 Funds</Text>
         <Text style={styles.amountRight}>₹{formatNumber(Portfolioheader.currentMktValue)}</Text>
-        <Text style={styles.performancePositive}>₹{(formatNumber(Portfolioheader.gainLoss))} of outperformance vs benchmark</Text>
-        
+
+{  isPortfolioXirrGreaterThanBenchmark &&      (<Text style={styles.performancePositive}>₹{(formatNumber(Portfolioheader.gainLoss))} of outperformance vs benchmark</Text>)}        
+{  isBenchmarkXirrGreaterThanPortfolio &&      (<Text style={styles.performanceNegative}>₹{(formatNumber(Portfolioheader.gainLoss))} of underperformance vs benchmark</Text>)}        
+    
       </TouchableOpacity>
 
       <TouchableOpacity

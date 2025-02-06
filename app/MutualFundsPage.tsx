@@ -276,6 +276,35 @@ if (loading || !Portfoliodetails || !Portfolioheader || !Portfoliohealth ) {
     }
   };
 
+  
+
+  const chartSize = 315; // Define the size of the chart
+  const radius = chartSize / 2; // Calculate the radius of the pie chart
+
+  // const donutData = [
+  //   {
+  //     name: "Buy",
+  //     amount: 100,
+  //     color: "#28A745",
+  //     legendFontColor: "#7F7F7F",
+  //     legendFontSize: 12,
+  //   },
+  //   {
+  //     name: "Hold",
+  //     amount: 700,
+  //     color: "#F57C00",
+  //     legendFontColor: "#7F7F7F",
+  //     legendFontSize: 12,
+  //   },
+  //   {
+  //     name: "Sell",
+  //     amount: 150,
+  //     color: "#DC3545",
+  //     legendFontColor: "#7F7F7F",
+  //     legendFontSize: 12,
+  //   },
+  // ];
+
   const donutData = [
     {
       name: "Buy",
@@ -308,8 +337,31 @@ if (loading || !Portfoliodetails || !Portfolioheader || !Portfoliohealth ) {
     { value: Number(Portfoliohealth?.Hold?.currentMktValue), color: '#F57C00' },
     { value: Number(Portfoliohealth?.Sell?.currentMktValue), color: '#DC3545'}
   ] 
+
+  // const series = [
+  //   { value: 100, color: '#28A745'  },
+  //   { value: 700, color: '#F57C00' },
+  //   { value: 150, color: '#DC3545'}
+  // ] 
   const totalAmount = donutData.reduce((sum, item) => sum + item.amount, 0);
 
+  // Function to calculate position for label based on angle
+  // const getLabelPosition = (angle : any, radius: any) => {
+  //   const radians = (angle - 90) * (Math.PI / 180); // Convert angle to radians
+  //   const x = radius * Math.cos(radians); // X coordinate
+  //   const y = radius * Math.sin(radians); // Y coordinate
+  //   return { x, y };
+  // };
+
+  // // Function to ensure the label stays within the bounds of the screen
+  // const clampPosition = (x: any, y: any, radius: any) => {
+  //   // Clamp x and y position to avoid exceeding the screen size
+  //   const clampedX = Math.min(Math.max(x, -radius), radius);
+  //   const clampedY = Math.min(Math.max(y, -radius), radius);
+  //   return { clampedX, clampedY };
+  // };
+
+ 
  
 
 
@@ -351,141 +403,231 @@ if (loading || !Portfoliodetails || !Portfolioheader || !Portfoliohealth ) {
          
      
 
-<View style={styles.card}>
+          <View style={styles.card}>
   <Text style={styles.headerText}>How did your portfolio perform?</Text>
 
-  {isPortfolioXirrGreaterThanBenchmark && (
-    <View style={styles.newPerformanceContainer}>
+  {isPortfolioXirrGreaterThanBenchmark  && (
+      <View style={styles.newPerformanceContainer}>
+      {/* Left Block (Portfolio or Benchmark XIRR) */}
       <View style={styles.leftBlock}>
-        <Text style={styles.largerText}>{`+${PortfolioXirrAnalysis.portfolioXirr.toFixed(2)}%`}</Text>
-        <Text style={styles.blockLabel}>Portfolio XIRR</Text>
+        <Text style={styles.largerText}>
+          {`+${(
+            isPortfolioXirrGreaterThanBenchmark
+              ? PortfolioXirrAnalysis.portfolioXirr
+              : PortfolioXirrAnalysis.benchmarkXirr
+          ).toFixed(2)}%`}
+        </Text>
+        <Text style={styles.blockLabel}>
+          {isPortfolioXirrGreaterThanBenchmark ? 'Portfolio XIRR' : 'Benchmark XIRR'}
+        </Text>
       </View>
-
+  
+      {/* Right Container (Difference, Portfolio XIRR, Benchmark XIRR) */}
       <View style={styles.rightContainer}>
-        {/* Difference container */}
+        {/* Difference Container */}
         <View
           style={[
             styles.topRightBlock,
             {
-              height: Math.max(30, (difference / Math.max(difference, PortfolioXirrAnalysis.portfolioXirr, PortfolioXirrAnalysis.benchmarkXirr)) * 100), // Ensure min height is 30 units
+              height: Math.max(
+                40,
+                (difference / Math.max(PortfolioXirrAnalysis.portfolioXirr, PortfolioXirrAnalysis.benchmarkXirr)) * 100
+              ),
             },
           ]}
         >
           <Text style={styles.performanceText}>{`+${difference.toFixed(2)}%`}</Text>
           <Text style={styles.blockLabel}>Difference</Text>
         </View>
-
-        {/* Portfolio XIRR container */}
+  
+        {/* Portfolio XIRR Container */}
         <View
           style={[
             styles.bottomRightBlock,
             {
-              height: Math.max(30, (PortfolioXirrAnalysis.portfolioXirr / Math.max(difference, PortfolioXirrAnalysis.portfolioXirr, PortfolioXirrAnalysis.benchmarkXirr)) * 100), // Ensure min height is 30 units
+              height: Math.max(
+                40,
+                (PortfolioXirrAnalysis.portfolioXirr / Math.max(PortfolioXirrAnalysis.portfolioXirr, PortfolioXirrAnalysis.benchmarkXirr)) * 100
+              ),
             },
           ]}
         >
           <Text style={styles.performanceText}>{`${PortfolioXirrAnalysis.portfolioXirr.toFixed(2)}%`}</Text>
           <Text style={styles.blockLabel}>Portfolio XIRR</Text>
         </View>
-
-        {/* Benchmark XIRR container */}
-        <View
+  
+        {/* Benchmark XIRR Container */}
+        {/* <View
           style={[
             styles.bottomRightBlock,
             {
-              height: Math.max(30, (PortfolioXirrAnalysis.benchmarkXirr / Math.max(difference, PortfolioXirrAnalysis.portfolioXirr, PortfolioXirrAnalysis.benchmarkXirr)) * 100), // Ensure min height is 30 units
+              height: Math.max(
+                30,
+                (PortfolioXirrAnalysis.benchmarkXirr / Math.max(PortfolioXirrAnalysis.portfolioXirr, PortfolioXirrAnalysis.benchmarkXirr)) * 100
+              ),
             },
           ]}
         >
           <Text style={styles.performanceText}>{`${PortfolioXirrAnalysis.benchmarkXirr.toFixed(2)}%`}</Text>
           <Text style={styles.blockLabel}>Benchmark XIRR</Text>
-        </View>
+        </View> */}
+        
       </View>
+      
     </View>
-  )}
+    ) }
+    {isBenchmarkXirrGreaterThanPortfolio  && (
+      <View style={styles.newPerformanceContainer}>
 
-  {isBenchmarkXirrGreaterThanPortfolio && (
-    <View style={styles.newPerformanceContainer}>
+        
+      
+  
+      {/* Right Container (Difference, Portfolio XIRR, Benchmark XIRR) */}
       <View style={styles.rightContainer}>
-        {/* Difference container */}
+        {/* Difference Container */}
         <View
           style={[
             styles.topRightBlock,
             {
-              height: Math.max(30, (difference / Math.max(difference, PortfolioXirrAnalysis.portfolioXirr, PortfolioXirrAnalysis.benchmarkXirr)) * 100), // Ensure min height is 30 units
+              height: Math.max(
+                40,
+                (difference / Math.max(PortfolioXirrAnalysis.portfolioXirr, PortfolioXirrAnalysis.benchmarkXirr)) * 100
+              ),
             },
           ]}
         >
           <Text style={styles.performanceText}>{`+${difference.toFixed(2)}%`}</Text>
           <Text style={styles.blockLabel}>Difference</Text>
         </View>
-
-        {/* Portfolio XIRR container */}
+  
+        {/* Portfolio XIRR Container */}
         <View
           style={[
             styles.bottomRightBlock,
             {
-              height: Math.max(30, (PortfolioXirrAnalysis.portfolioXirr / Math.max(difference, PortfolioXirrAnalysis.portfolioXirr, PortfolioXirrAnalysis.benchmarkXirr)) * 100), // Ensure min height is 30 units
+              height: Math.max(
+                40,
+                (PortfolioXirrAnalysis.portfolioXirr / Math.max(PortfolioXirrAnalysis.portfolioXirr, PortfolioXirrAnalysis.benchmarkXirr)) * 100
+              ),
             },
           ]}
         >
           <Text style={styles.performanceText}>{`${PortfolioXirrAnalysis.portfolioXirr.toFixed(2)}%`}</Text>
           <Text style={styles.blockLabel}>Portfolio XIRR</Text>
         </View>
+        
+  
+        {/* Benchmark XIRR Container */}
+        {/* <View
+          style={[
+            styles.bottomRightBlock,
+            {
+              height: Math.max(
+                30,
+                (PortfolioXirrAnalysis.benchmarkXirr / Math.max(PortfolioXirrAnalysis.portfolioXirr, PortfolioXirrAnalysis.benchmarkXirr)) * 100
+              ),
+            },
+          ]}
+        >
+          <Text style={styles.performanceText}>{`${PortfolioXirrAnalysis.benchmarkXirr.toFixed(2)}%`}</Text>
+          <Text style={styles.blockLabel}>Benchmark XIRR</Text>
+        </View> */}
+        
       </View>
 
+      {/* Left Block (Portfolio or Benchmark XIRR) */}
       <View style={styles.leftBlock}>
-        <Text style={styles.largerText}>{`+${PortfolioXirrAnalysis.benchmarkXirr.toFixed(2)}%`}</Text>
-        <Text style={styles.blockLabel}>Benchmark XIRR</Text>
+        <Text style={styles.largerText}>
+          {`+${(
+            isPortfolioXirrGreaterThanBenchmark
+              ? PortfolioXirrAnalysis.portfolioXirr
+              : PortfolioXirrAnalysis.benchmarkXirr
+          ).toFixed(2)}%`}
+        </Text>
+        <Text style={styles.blockLabel}>
+          {isPortfolioXirrGreaterThanBenchmark ? 'Portfolio XIRR' : 'Benchmark XIRR'}
+        </Text>
       </View>
+      
     </View>
-  )}
-
-  <Text style={styles.cardNote}>
+    ) }
+  {isBenchmarkXirrGreaterThanPortfolio && (
+    <Text style={styles.negativecardNote}>
     Your portfolio could have potentially earned more with active investing
-  </Text>
+  </Text> 
+  )}
+  {isPortfolioXirrGreaterThanBenchmark && (
+    <Text style={styles.positivecardNote}>
+    Your portfolio have earned more than Benchmark XIRR
+  </Text> 
+  )}
+  
 </View>
 
 
 
 
-          {/* Analysis Section (Updated to match StockPortfolio) */}
-          <View style={styles.analysisSection}>
-            <Text style={styles.headerText}>Mutual Fund Analysis</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('DetailedAnalysis')}>
-            <View style={styles.graphContainer}>
-              <PieChart
-                series={series}
-                widthAndHeight= {250}
-                cover={0.65}
-              />
-              
-              {/* <View style={styles.donutCenter}>
-                <TouchableOpacity onPress={() => navigation.navigate('DetailedAnalysis')}>
-                <Text style={styles.donutCenterText}>Analysis</Text>
-                </TouchableOpacity>
-              </View> */}
-            </View>
-            </TouchableOpacity>
 
-            {/* Legends */}
-            <View style={styles.legendContainer}>
-            {donutData.map((item, index) => {
-              const percentage = totalAmount > 0 ? ((item.amount / totalAmount) * 100).toFixed(2) : "0.00";
+<View style={styles.analysisSection}>
+  <Text style={styles.headerText}>Mutual Fund Analysis</Text>
+  <TouchableOpacity onPress={() => navigation.navigate('DetailedAnalysis')}>
+    <View style={styles.graphContainer}>
+      <PieChart
+        series={series}
+        widthAndHeight={250}
+        cover={0.65}
+      />
+    </View>
+  </TouchableOpacity>
 
-              return (
-                <View key={index} style={styles.legendItem}>
-                  <View style={[styles.legendColor, { backgroundColor: item.color }]} />
-                  <Text style={styles.legendText}>{`${item.name} (${percentage}%)`}</Text>
-                </View>
-              );
-            })}
-          </View>
+  {/* Labels near PieChart Sections */}
+  <View style={styles.labelContainer}>
+    {donutData.map((item, index) => {
+      // Calculate the cumulative percentage for the current item
+      const totalAmount = donutData.reduce((sum, data) => sum + data.amount, 0);
+      const cumulativePercentage = donutData
+        .slice(0, index + 1)
+        .reduce((sum, data) => sum + (data.amount / totalAmount), 0);
 
-            <Text style={styles.subTitle}></Text>
-            <Text style={styles.subTitle}>Consider rebalancing low-performing funds to optimize returns.</Text>
-          </View>
+      // Calculate the midpoint angle for the current section
+      const midAngle = cumulativePercentage * 360 - (item.amount / totalAmount / 2) * 360;
 
+      // Convert the angle to radians
+      const radians = (midAngle - 90) * (Math.PI / 180);
+
+      // Calculate the x and y coordinates for the label
+      const radius = 200; // Half of widthAndHeight (250 / 2)
+      const labelDistance = radius * 0.8; // Distance from the center for the label
+      const x = labelDistance * Math.cos(radians);
+      const y = labelDistance * Math.sin(radians);
+
+      // Adjust the label position relative to the pie chart's center
+      const centerX = 125; // Half of widthAndHeight (250 / 2)
+      const centerY = 125; // Half of widthAndHeight (250 / 2)
+      const topPosition = centerY + y - 10; // Adjust for text height
+      const leftPosition = centerX + x - 10; // Adjust for text width
+
+      return (
+        <Text
+          key={index}
+          style={[
+            styles.pieLabel,
+            {
+              position: 'absolute',
+              top: topPosition,
+              left: leftPosition,
+              color: item.color,
+            },
+          ]}
+        >
+          {item.name}
+        </Text>
+      );
+    })}
+  </View>
+
+  <Text style={styles.subTitle}>Consider rebalancing low-performing funds to optimize returns.</Text>
+</View>
           {/* Metrics Section */}
           <View style={styles.card}>
             <View style={styles.header}>
@@ -592,9 +734,13 @@ const styles = StyleSheet.create({
     color: '#4caf50',
     fontWeight: '600',
   },
-  cardNote: {
+  negativecardNote: {
     fontSize: 16,
     color: '#ee2222',
+  },
+  positivecardNote: {
+    fontSize: 16,
+    color: '#22ee22',
   },
   // Performance Section styles (matching StockPortfolio)
   newPerformanceContainer: {
@@ -604,7 +750,6 @@ const styles = StyleSheet.create({
   leftBlock: {
     flex: 1.5,
     backgroundColor: '#ecfdf5',
-    height: 100,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 10,
@@ -617,7 +762,6 @@ const styles = StyleSheet.create({
   },
   topRightBlock: {
     backgroundColor: '#fef4e8',
-    height: 45,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
@@ -625,7 +769,6 @@ const styles = StyleSheet.create({
   },
   bottomRightBlock: {
     backgroundColor: '#ecfdf5',
-    height: 45,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
@@ -751,6 +894,19 @@ const styles = StyleSheet.create({
   },
   sharpeCard: {
     backgroundColor: '#ecfdf5',
+  },
+  labelContainer: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: [{ translateX: '-50%' }, { translateY: '-50%' }],
+    width: 250,
+    height: 250,
+  },
+  pieLabel: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
   // touchableArea: {
   //   marginTop: 5,
