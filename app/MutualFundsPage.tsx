@@ -572,8 +572,8 @@ if (loading || !Portfoliodetails || !Portfolioheader || !Portfoliohealth ) {
 
 
 <View style={styles.analysisSection}>
+<TouchableOpacity onPress={() => navigation.navigate('DetailedAnalysis')}>
   <Text style={styles.headerText}>Mutual Fund Analysis</Text>
-  <TouchableOpacity onPress={() => navigation.navigate('DetailedAnalysis')}>
     <View style={styles.graphContainer}>
       <PieChart
         series={series}
@@ -581,7 +581,7 @@ if (loading || !Portfoliodetails || !Portfolioheader || !Portfoliohealth ) {
         cover={0.65}
       />
     </View>
-  </TouchableOpacity>
+  
 
   {/* Labels near PieChart Sections */}
   <View style={styles.labelContainer}>
@@ -632,6 +632,7 @@ if (loading || !Portfoliodetails || !Portfolioheader || !Portfoliohealth ) {
       );
     })}
   </View>
+  </TouchableOpacity>
 
   <Text style={styles.subTitle}>Consider rebalancing low-performing funds to optimize returns.</Text>
 </View>
