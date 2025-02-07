@@ -93,7 +93,7 @@ const Dashboard = () => {
     }, [])
   );
 
-  if (loading){
+  if (loading || !PortfolioXirrAnalysis || !Portfoliodetails ||!Portfolioheader ||!Portfoliohealth){
     return(
       <View style={styles.centerContainer}>
               <ActivityIndicator size="large" color="#aaaaaa" />
