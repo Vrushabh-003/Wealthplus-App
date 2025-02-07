@@ -9,15 +9,12 @@
       "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal",
-      "android": {
-        "format": "apk"
-      }
+      "distribution": "internal"
     },
     "production": {
       "autoIncrement": true,
       "android": {
-        "format": "apk"
+        "distribution": "store"
       }
     }
   },
