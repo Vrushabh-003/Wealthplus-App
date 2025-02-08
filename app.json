@@ -22,8 +22,7 @@
         "backgroundColor": "#ffffff"  
       },
       "permissions": ["INTERNET","WRITE_EXTERNAL_STORAGE", "READ_EXTERNAL_STORAGE"],
-      "package": "com.naresh_t.WealthPlus",
-      "networkSecurityConfig": "./res/xml/network_security_config.xml"
+      "package": "com.naresh_t.WealthPlus"
     },
     "web": {
       "bundler": "metro",
