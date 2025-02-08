@@ -114,7 +114,7 @@ const DetailedAnalysis = () => {
         <TouchableOpacity onPress={() => navigation.navigate('MutualFundsPage')}>
           <Icon name="arrow-back" size={30} color="#000" />
         </TouchableOpacity>
-        <Text style={styles.title}>Mutual Fund Recommendations</Text>
+        <Text style={styles.title}>Fund Recommendations</Text>
       </View>
 
       <View style={styles.sectionGood}>
@@ -124,9 +124,9 @@ const DetailedAnalysis = () => {
     <View key={index} style={styles.cardGood}>
 
       {/* Stock Name & Market Value - Right Aligned */}
-      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+      <View>
         <Text style={styles.stockTitle}>{stock.schemeName}</Text>
-        <Text style={styles.stockTitle}>₹{formatNumber(stock.currentMktValue)}</Text>
+        <Text style={styles.stockTitle}>Current Value ₹{formatNumber(stock.currentMktValue)}</Text>
       </View>
 
       {/* Stock XIRR & Benchmark Name with XIRR - Right Aligned */}
@@ -155,9 +155,9 @@ const DetailedAnalysis = () => {
     <View key={index} style={styles.cardMonitor}>
 
       {/* Stock Name & Market Value - Right Aligned */}
-      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+      <View>
         <Text style={styles.stockTitle}>{stock.schemeName}</Text>
-        <Text style={styles.stockTitle}>₹{formatNumber(stock.currentMktValue)}</Text>
+        <Text style={styles.stockTitle}>Current Value ₹{formatNumber(stock.currentMktValue)}</Text>
       </View>
 
       {/* Stock XIRR & Benchmark Name with XIRR - Right Aligned */}
@@ -204,9 +204,9 @@ const DetailedAnalysis = () => {
     <View key={index} style={styles.cardLow}>
       
       {/* Stock Name & Market Value - Right Aligned */}
-      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+      <View>
         <Text style={styles.stockTitle}>{stock.schemeName}</Text>
-        <Text style={styles.stockTitle}>₹{formatNumber(stock.currentMktValue)}</Text>
+        <Text style={styles.stockTitle}>Current Value ₹{formatNumber(stock.currentMktValue)}</Text>
       </View>
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
       {/* Stock XIRR */}
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
   },
   cardGood: {
     backgroundColor: '#f0fff0',
-    padding: 15,
+    padding: 20,
     borderRadius: 8,
     marginBottom: 10,
   },
@@ -320,12 +320,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   stockTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 14,
+    fontWeight: 700,
     color: '#222',
   },
   stockDetail: {
-    fontSize: 14,
+    fontSize: 12,
     marginTop: 4,
   },
   positiveText: {
@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
     color: '#D32F2F',
   },
   description: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#555',
     marginTop: 4,
   },

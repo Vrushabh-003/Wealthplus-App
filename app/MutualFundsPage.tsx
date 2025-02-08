@@ -278,7 +278,7 @@ if (loading || !Portfoliodetails || !Portfolioheader || !Portfoliohealth ) {
 
   
 
-  const chartSize = 315; // Define the size of the chart
+  const chartSize = 150; // Define the size of the chart
   const radius = chartSize / 2; // Calculate the radius of the pie chart
 
   // const donutData = [
@@ -577,7 +577,7 @@ if (loading || !Portfoliodetails || !Portfolioheader || !Portfoliohealth ) {
     <View style={styles.graphContainer}>
       <PieChart
         series={series}
-        widthAndHeight={250}
+        widthAndHeight={170}
         cover={0.65}
       />
     </View>
@@ -599,16 +599,16 @@ if (loading || !Portfoliodetails || !Portfolioheader || !Portfoliohealth ) {
       const radians = (midAngle - 90) * (Math.PI / 180);
 
       // Calculate the x and y coordinates for the label
-      const radius = 200; // Half of widthAndHeight (250 / 2)
-      const labelDistance = radius * 0.8; // Distance from the center for the label
+      const radius = 175; // Half of widthAndHeight (250 / 2)
+      const labelDistance = radius * 0.62; // Distance from the center for the label
       const x = labelDistance * Math.cos(radians);
       const y = labelDistance * Math.sin(radians);
 
       // Adjust the label position relative to the pie chart's center
-      const centerX = 125; // Half of widthAndHeight (250 / 2)
-      const centerY = 125; // Half of widthAndHeight (250 / 2)
-      const topPosition = centerY + y - 10; // Adjust for text height
-      const leftPosition = centerX + x - 10; // Adjust for text width
+      const centerX = 90; // Half of widthAndHeight (250 / 2)
+      const centerY = 90; // Half of widthAndHeight (250 / 2)
+      const topPosition = centerY + y; // Adjust for text height
+      const leftPosition = centerX + x-5; // Adjust for text width
 
       if (item.amount==0){
         return null;
