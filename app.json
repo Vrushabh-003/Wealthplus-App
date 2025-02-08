@@ -21,7 +21,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"  
       },
-      "permissions": ["INTERNET"],
+      "permissions": ["INTERNET","WRITE_EXTERNAL_STORAGE", "READ_EXTERNAL_STORAGE"],
       "package": "com.naresh_t.WealthPlus"
     },
     "web": {

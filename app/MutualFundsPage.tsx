@@ -43,8 +43,18 @@ const MutualFundsPage: React.FC = () => {
   const [PortfolioXirrAnalysis, setPortfolioXirrAnalysis] = useState<any>(null);
   const fetchData = async () => {
     try {
+
+      const portfolioHeader=fetch('http://api.inwealthera.com/api/portfolio/getPortfolioHeader', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          reqId: '15043487',
+          mobile: '+919940615334',
+          type: 'mutual_funds',
+        }),
+      })
+
       const portfolioXirrAnalysis = await AsyncStorage.getItem('MFPortfolioXirrAnalysis');
-      const portfolioHeader = await AsyncStorage.getItem('MFPortfolioheader');
       const portfolioDetails = await AsyncStorage.getItem('MFPortfoliodetails');
       const portfolioHealth = await AsyncStorage.getItem('MFPortfoliohealth');
   
@@ -55,7 +65,7 @@ const MutualFundsPage: React.FC = () => {
       console.log("MFPortfoliohealth:", portfolioHealth);
   
       setPortfolioXirrAnalysis(portfolioXirrAnalysis ? JSON.parse(portfolioXirrAnalysis) : {});
-      setPortfolioHeader(portfolioHeader ? JSON.parse(portfolioHeader) : {});
+      // setPortfolioHeader(portfolioHeader ? JSON.parse(portfolioHeader) : {});
       setPortfolioDetails(portfolioDetails ? JSON.parse(portfolioDetails) : {});
       setPortfolioHealth(portfolioHealth ? JSON.parse(portfolioHealth) : {});
     } catch (error) {
@@ -117,107 +127,107 @@ const MutualFundsPage: React.FC = () => {
   //   fetchPortfolioData();
   // }, []);
 
-  // useEffect(() => {
-  //     const fetchPortfolioStatus = async () => {
-  //       try {
-  //         const response = await fetch('http://api.inwealthera.com/api/portfolio/getPortfolioHealth', {
-  //           method: 'POST',
-  //           headers: {
-  //             'Content-Type': 'application/json',
-  //           },
-  //           body: JSON.stringify({
-  //             reqId: '15043487',
-  //             mobile: '+919940615334',
-  //             type: 'mutual_funds',
-  //           }),
-  //         });
-  //         const data = await response.json();
-  //         setPortfolioHealth(data);
-  //         console.log('Portfolio status:', data);
-  //       } catch (error) {
-  //         console.error('Error fetching portfolio status:', error);
-  //       }
-  //     };
+  useEffect(() => {
+      const fetchPortfolioStatus = async () => {
+        try {
+          const response = await fetch('http://api.inwealthera.com/api/portfolio/getPortfolioHealth', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              reqId: '15043487',
+              mobile: '+919940615334',
+              type: 'mutual_funds',
+            }),
+          });
+          const data = await response.json();
+          setPortfolioHealth(data);
+          console.log('Portfolio status:', data);
+        } catch (error) {
+          console.error('Error fetching portfolio status:', error);
+        }
+      };
   
-  //     fetchPortfolioStatus();
-  //   }, []);
+      fetchPortfolioStatus();
+    }, []);
 
 
-  // useEffect(() => {
-  //     const fetchPortfolioStatus = async () => {
-  //       try {
-  //         const response = await fetch('http://api.inwealthera.com/api/portfolio/getPortfolioHeader', {
-  //           method: 'POST',
-  //           headers: {
-  //             'Content-Type': 'application/json',
-  //           },
-  //           body: JSON.stringify({
-  //             reqId: '15043487',
-  //             mobile: '+919940615334',
-  //             type: 'mutual_funds',
-  //           }),
-  //         });
-  //         const data = await response.json();
-  //         setPortfolioHeader(data);
-  //         console.log('Portfolio status:', data);
-  //       } catch (error) {
-  //         console.error('Error fetching portfolio status:', error);
-  //       }
-  //     };
+  useEffect(() => {
+      const fetchPortfolioStatus = async () => {
+        try {
+          const response = await fetch('http://api.inwealthera.com/api/portfolio/getPortfolioHeader', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              reqId: '15043487',
+              mobile: '+919940615334',
+              type: 'mutual_funds',
+            }),
+          });
+          const data = await response.json();
+          setPortfolioHeader(data);
+          console.log('Portfolio status:', data);
+        } catch (error) {
+          console.error('Error fetching portfolio status:', error);
+        }
+      };
   
-  //     fetchPortfolioStatus();
-  //   }, []);
+      fetchPortfolioStatus();
+    }, []);
 
-    // useEffect(() => {
-    //     const fetchPortfolioStatus = async () => {
-    //       try {
-    //         const response = await fetch('http://api.inwealthera.com/api/portfolio/getPortfolioDetails', {
-    //           method: 'POST',
-    //           headers: {
-    //             'Content-Type': 'application/json',
-    //           },
-    //           body: JSON.stringify({
-    //             reqId: '15043487',
-    //             mobile: '+919940615334',
-    //             type: 'mutual_funds',
-    //           }),
-    //         });
-    //         const data = await response.json();
-    //         setPortfolioDetails(data);
-    //         console.log('Portfolio status:', data);
-    //       } catch (error) {
-    //         console.error('Error fetching portfolio status:', error);
-    //       }
-    //     };
+    useEffect(() => {
+        const fetchPortfolioStatus = async () => {
+          try {
+            const response = await fetch('http://api.inwealthera.com/api/portfolio/getPortfolioDetails', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                reqId: '15043487',
+                mobile: '+919940615334',
+                type: 'mutual_funds',
+              }),
+            });
+            const data = await response.json();
+            setPortfolioDetails(data);
+            console.log('Portfolio status:', data);
+          } catch (error) {
+            console.error('Error fetching portfolio status:', error);
+          }
+        };
     
-    //     fetchPortfolioStatus();
-    //   }, []);
+        fetchPortfolioStatus();
+      }, []);
 
 
-      // useEffect(() => {
-      //     const fetchPortfolioStatus = async () => {
-      //       try {
-      //         const response = await fetch('http://api.inwealthera.com/api/api/portfolio/getPortfolioXirrAnalysis', {
-      //           method: 'POST',
-      //           headers: {
-      //             'Content-Type': 'application/json',
-      //           },
-      //           body: JSON.stringify({
-      //             reqId: '15043487',
-      //             mobile: '+919940615334',
-      //             type: 'mutual_funds',
-      //           }),
-      //         });
-      //         const data = await response.json();
-      //         setPortfolioXirrAnalysis(data);
-      //         console.log('Portfolio status:', data);
-      //       } catch (error) {
-      //         console.error('Error fetching portfolio status:', error);
-      //       }
-      //     };
+      useEffect(() => {
+          const fetchPortfolioStatus = async () => {
+            try {
+              const response = await fetch('http://api.inwealthera.com/api/api/portfolio/getPortfolioXirrAnalysis', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  reqId: '15043487',
+                  mobile: '+919940615334',
+                  type: 'mutual_funds',
+                }),
+              });
+              const data = await response.json();
+              setPortfolioXirrAnalysis(data);
+              console.log('Portfolio status:', data);
+            } catch (error) {
+              console.error('Error fetching portfolio status:', error);
+            }
+          };
       
-      //     fetchPortfolioStatus();
-      //   }, []);
+          fetchPortfolioStatus();
+        }, []);
 
   // Calculate performance details similar to StockPortfolio
   let greaterValue = 0,
