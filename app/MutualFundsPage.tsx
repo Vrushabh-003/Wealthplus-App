@@ -44,16 +44,7 @@ const MutualFundsPage: React.FC = () => {
   const fetchData = async () => {
     try {
 
-      const portfolioHeader=fetch('http://api.inwealthera.com/api/portfolio/getPortfolioHeader', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          reqId: '15043487',
-          mobile: '+919940615334',
-          type: 'mutual_funds',
-        }),
-      })
-
+      const portfolioHeader = await AsyncStorage.getItem('MFPortfolioheader')
       const portfolioXirrAnalysis = await AsyncStorage.getItem('MFPortfolioXirrAnalysis');
       const portfolioDetails = await AsyncStorage.getItem('MFPortfoliodetails');
       const portfolioHealth = await AsyncStorage.getItem('MFPortfoliohealth');
