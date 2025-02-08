@@ -132,7 +132,8 @@ const Dashboard = () => {
     difference = greaterValue - smallerValue;
   }
 
-  const mfdiff=(difference/100)*Portfolioheader.currentMktValue
+  const mfdiff=(difference/100)*Portfolioheader.currentMktValue;
+  const mfcount = Portfoliohealth?.Buy?.fundCount +Portfoliohealth?.Hold?.fundCount+Portfoliohealth?.Sell?.fundCount;
 
   return (
     <ScrollView style={styles.container}>
@@ -175,7 +176,7 @@ const Dashboard = () => {
         onPress={() => navigation.navigate('MutualFundsPage')} // Navigate to MutualFundsPage
       >
         <Text style={styles.sectionTitle}>📅 Mutual Funds</Text>
-        <Text style={styles.sectionSubtitle}>19 Funds</Text>
+        <Text style={styles.sectionSubtitle}>{mfcount} Funds</Text>
         <Text style={styles.amountRight}>₹{formatNumber(Portfolioheader.currentMktValue)}</Text>
 
 {  isPortfolioXirrGreaterThanBenchmark &&      (<Text style={styles.performancePositive}>₹{(formatNumber(String(mfdiff)))} of outperformance vs benchmark</Text>)}        
@@ -188,9 +189,9 @@ const Dashboard = () => {
         onPress={() => navigation.navigate('StockPortfolio')} // Navigate to StockPortfolio
       >
         <Text style={styles.sectionTitle}>📈 Stocks</Text>
-        <Text style={styles.sectionSubtitle}>51 Stocks</Text>
-        <Text style={styles.amountRight}>₹82.3L</Text>
-        <Text style={styles.performanceNegative}>₹8.55L of missed gains vs benchmark</Text>
+        <Text style={styles.sectionSubtitle}>0 Stocks</Text>
+        <Text style={styles.amountRight}>₹0.00</Text>
+        <Text style={styles.performancePositive}>₹0.00 of missed gains vs benchmark</Text>
       </TouchableOpacity>
 
       {/* Portfolio Health */}
