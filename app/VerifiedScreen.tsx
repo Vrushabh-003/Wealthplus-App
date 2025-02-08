@@ -22,6 +22,15 @@ const VerifiedScreen = () => {
   useEffect(() => {
     const fetchPortfolioData = async () => {
       try {
+        // Clear old data before fetching new data
+        await AsyncStorage.multiRemove([
+          'MFPortfoliodetails',
+          'MFPortfolioheader',
+          'MFPortfoliohealth',
+          'MFPortfolioXirrAnalysis',
+          'MFPortfolioHealthDetailed',
+        ]);
+
         const responses = await Promise.all([
           fetch('http://api.inwealthera.com/api/portfolio/getPortfolioHealth', {
             method: 'POST',
@@ -50,7 +59,7 @@ const VerifiedScreen = () => {
               type: 'mutual_funds',
             }),
           }),
-          fetch('http://api.inwealthera.com/api/api/portfolio/getPortfolioXirrAnalysis', {
+          fetch('http://api.inwealthera.com/api/portfolio/getPortfolioXirrAnalysis', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -74,9 +83,7 @@ const VerifiedScreen = () => {
           responses.map((res) => res.json())
         );
 
-
-
-        setPortfolioData({ health, header, details, xirrAnalysis ,healthdetailed});
+        setPortfolioData({ health, header, details, xirrAnalysis ,healthdetailed });
         console.log('Portfolio data:', { health, header, details, xirrAnalysis, healthdetailed });
         setLoading(false);
         

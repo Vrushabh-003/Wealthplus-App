@@ -163,7 +163,7 @@ const Dashboard = () => {
         <View style={styles.rowContainer}>
           <View>
             <Text style={styles.subText}>Portfolio XIRR</Text>
-            <Text style={styles.xirr}>{`+${PortfolioXirrAnalysis.portfolioXirr.toFixed(2)}%`}</Text>
+            <Text style={styles.xirr}>{(PortfolioXirrAnalysis.portfolioXirr)+"%"}</Text>
           </View>
           
         </View>
