@@ -42,16 +42,27 @@ const MutualFundsPage: React.FC = () => {
   const [Portfolioheader, setPortfolioHeader] = useState<any>(null);
   const [PortfolioXirrAnalysis, setPortfolioXirrAnalysis] = useState<any>(null);
   const fetchData = async () => {
-    const portfolioXirrAnalysis = await AsyncStorage.getItem('MFPortfolioXirrAnalysis');
-    const portfolioHeader = await AsyncStorage.getItem('MFPortfolioheader');
-    const portfolioDetails = await AsyncStorage.getItem('MFPortfoliodetails');
-    const portfolioHealth = await AsyncStorage.getItem('MFPortfoliohealth');
+    try {
+      const portfolioXirrAnalysis = await AsyncStorage.getItem('MFPortfolioXirrAnalysis');
+      const portfolioHeader = await AsyncStorage.getItem('MFPortfolioheader');
+      const portfolioDetails = await AsyncStorage.getItem('MFPortfoliodetails');
+      const portfolioHealth = await AsyncStorage.getItem('MFPortfoliohealth');
   
-    setPortfolioXirrAnalysis(portfolioXirrAnalysis ? JSON.parse(portfolioXirrAnalysis) : {});
-    setPortfolioHeader(portfolioHeader ? JSON.parse(portfolioHeader) : {});
-    setPortfolioDetails(portfolioDetails ? JSON.parse(portfolioDetails) : {});
-    setPortfolioHealth(portfolioHealth ? JSON.parse(portfolioHealth) : {});
+      console.log("Data from AsyncStorage:");
+      console.log("MFPortfolioXirrAnalysis:", portfolioXirrAnalysis);
+      console.log("MFPortfolioheader:", portfolioHeader);
+      console.log("MFPortfoliodetails:", portfolioDetails);
+      console.log("MFPortfoliohealth:", portfolioHealth);
+  
+      setPortfolioXirrAnalysis(portfolioXirrAnalysis ? JSON.parse(portfolioXirrAnalysis) : {});
+      setPortfolioHeader(portfolioHeader ? JSON.parse(portfolioHeader) : {});
+      setPortfolioDetails(portfolioDetails ? JSON.parse(portfolioDetails) : {});
+      setPortfolioHealth(portfolioHealth ? JSON.parse(portfolioHealth) : {});
+    } catch (error) {
+      console.error("Error fetching data from AsyncStorage:", error);
+    }
   };
+  
   
   useEffect(() => {
     fetchData();

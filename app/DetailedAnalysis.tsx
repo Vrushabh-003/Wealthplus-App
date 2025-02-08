@@ -36,9 +36,14 @@ const DetailedAnalysis = () => {
     
 
     const fetchData = async () => {
+      try{
       const portfolioHealthDetailed = await AsyncStorage.getItem('MFPortfolioHealthDetailed');
       console.log('Fetched Data from AsyncStorage:', portfolioHealthDetailed); // Log data
       setPortfolioHealthDetailed(portfolioHealthDetailed ? JSON.parse(portfolioHealthDetailed) : {});
+      } 
+      catch (error) {
+        console.error('Error fetching data:', error); // Log error
+      }
    };
 
      useEffect(() => {
