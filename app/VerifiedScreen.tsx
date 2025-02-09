@@ -10,13 +10,14 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList, "PhoneNumber
 const VerifiedScreen = () => {
   const navigation = useNavigation<NavigationProp>();
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const [portfolioData, setPortfolioData] = useState({
-    health: null,
-    header: null,
-    details: null,
-    xirrAnalysis: null,
-    healthdetailed: null
+    health: {},
+    header: {},
+    details: {},
+    xirrAnalysis: {},
+    healthdetailed: {},
   });
 
   useEffect(() => {
@@ -83,19 +84,24 @@ const VerifiedScreen = () => {
           responses.map((res) => res.json())
         );
 
-        setPortfolioData({ health, header, details, xirrAnalysis ,healthdetailed });
-        console.log('Portfolio data:', { health, header, details, xirrAnalysis, healthdetailed });
-        setLoading(false);
-        
-        // Save data to AsyncStorage
-        await AsyncStorage.setItem('MFPortfoliodetails', JSON.stringify(details));
-        await AsyncStorage.setItem('MFPortfolioheader', JSON.stringify(header));
-        await AsyncStorage.setItem('MFPortfoliohealth', JSON.stringify(health));
-        await AsyncStorage.setItem('MFPortfolioXirrAnalysis', JSON.stringify(xirrAnalysis));
-        await AsyncStorage.setItem('MFPortfolioHealthDetailed', JSON.stringify(healthdetailed));
+        // Check if any of the responses are invalid (null/undefined)
+        if (health && header && details && xirrAnalysis && healthdetailed) {
+          setPortfolioData({ health, header, details, xirrAnalysis, healthdetailed });
+          console.log('Portfolio data:', { health, header, details, xirrAnalysis, healthdetailed });
 
+          // Save data to AsyncStorage
+          await AsyncStorage.setItem('MFPortfoliodetails', JSON.stringify(details));
+          await AsyncStorage.setItem('MFPortfolioheader', JSON.stringify(header));
+          await AsyncStorage.setItem('MFPortfoliohealth', JSON.stringify(health));
+          await AsyncStorage.setItem('MFPortfolioXirrAnalysis', JSON.stringify(xirrAnalysis));
+          await AsyncStorage.setItem('MFPortfolioHealthDetailed', JSON.stringify(healthdetailed));
+        } else {
+          setError('One or more responses were invalid');
+        }
+        setLoading(false);
       } catch (error) {
         console.error('Error fetching portfolio data:', error);
+        setError('An error occurred while fetching the data.');
         setLoading(false); // Stop loading even if there's an error
       }
     };
@@ -117,6 +123,14 @@ const VerifiedScreen = () => {
     return (
       <View style={styles.centerContainer}>
         <ActivityIndicator size="large" color="#aaaaaa" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.centerContainer}>
+        <Text style={styles.errorText}>{error}</Text>
       </View>
     );
   }
@@ -186,7 +200,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    color: '#ffffff'
+  },
+  errorText: {
+    fontSize: 18,
+    color: 'red',
+    textAlign: 'center',
   },
 });
 

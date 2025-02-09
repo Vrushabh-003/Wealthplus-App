@@ -56,7 +56,7 @@ const MutualFundsPage: React.FC = () => {
       console.log("MFPortfoliohealth:", portfolioHealth);
   
       setPortfolioXirrAnalysis(portfolioXirrAnalysis ? JSON.parse(portfolioXirrAnalysis) : {});
-      // setPortfolioHeader(portfolioHeader ? JSON.parse(portfolioHeader) : {});
+      setPortfolioHeader(portfolioHeader ? JSON.parse(portfolioHeader) : {});
       setPortfolioDetails(portfolioDetails ? JSON.parse(portfolioDetails) : {});
       setPortfolioHealth(portfolioHealth ? JSON.parse(portfolioHealth) : {});
     } catch (error) {
