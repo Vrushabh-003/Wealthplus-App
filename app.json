@@ -19,9 +19,17 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"  
+        "backgroundColor": "#ffffff",
+        "usesCleartextTraffic": true
       },
-      "permissions": ["INTERNET","WRITE_EXTERNAL_STORAGE", "READ_EXTERNAL_STORAGE"],
+
+      
+
+      "permissions": [
+        "INTERNET",
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_EXTERNAL_STORAGE"
+      ],
       "package": "com.naresh_t.WealthPlus",
       "networkSecurityConfig": "./res/xml/network_security_config.xml"
     },
@@ -31,8 +39,17 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ]
     ],
+
     "experiments": {
       "typedRoutes": true
     },
@@ -41,7 +58,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "a369f6e2-9fab-4dd7-acae-0e1f894fade3"
+        "projectId": "793c1f47-05ff-4734-8715-e37e0240bf4c"
       }
     }
   }
