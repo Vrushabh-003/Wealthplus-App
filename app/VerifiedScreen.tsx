@@ -33,7 +33,7 @@ const VerifiedScreen = () => {
         ]);
 
         const responses = await Promise.all([
-          fetch('http://api.inwealthera.com/api/portfolio/getPortfolioHealth', {
+          fetch('https://api.inwealthera.com/api/portfolio/getPortfolioHealth', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -42,7 +42,7 @@ const VerifiedScreen = () => {
               type: 'mutual_funds',
             }),
           }),
-          fetch('http://api.inwealthera.com/api/portfolio/getPortfolioHeader', {
+          fetch('https://api.inwealthera.com/api/portfolio/getPortfolioHeader', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -51,7 +51,7 @@ const VerifiedScreen = () => {
               type: 'mutual_funds',
             }),
           }),
-          fetch('http://api.inwealthera.com/api/portfolio/getPortfolioDetails', {
+          fetch('https://api.inwealthera.com/api/portfolio/getPortfolioDetails', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -60,7 +60,7 @@ const VerifiedScreen = () => {
               type: 'mutual_funds',
             }),
           }),
-          fetch('http://api.inwealthera.com/api/portfolio/getPortfolioXirrAnalysis', {
+          fetch('https://api.inwealthera.com/api/portfolio/getPortfolioXirrAnalysis', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -69,7 +69,7 @@ const VerifiedScreen = () => {
               type: 'mutual_funds',
             }),
           }),
-          fetch('http://api.inwealthera.com/api/api/portfolio/getPortfolioHealthDetailed', {
+          fetch('https://api.inwealthera.com/api/api/portfolio/getPortfolioHealthDetailed', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
