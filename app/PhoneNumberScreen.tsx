@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Animated } from "react-native";
 import { RootStackParamList } from "./index";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-
+import RNSimData from 'react-native-sim-data';  // Import the library to fetch SIM data
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, "PhoneNumberScreen">;
 
@@ -12,13 +12,25 @@ const PhoneNumberScreen = () => {
   const [phoneNumber, setPhoneNumber] = useState("9940615334");
   const [progress, setProgress] = useState(new Animated.Value(0));
   const navigation = useNavigation();
-  
 
   useEffect(() => {
+    // Fetch the phone number from the SIM card (if available)
+    try {
+      const simInfo = RNSimData.getSimInfo();  // Fetch SIM data
+      console.log(simInfo);  // Log the result to inspect available properties
+
+      // Check for the first SIM card's phone number
+      if (simInfo && simInfo.phoneNumber0) {
+        setPhoneNumber(simInfo.phoneNumber0);  // Set the phone number for the first SIM slot
+      }
+    } catch (error) {
+      console.error("Error fetching phone number:", error);
+    }
+
     // Animate progress bar
     Animated.timing(progress, {
       toValue: 0.25,
-      duration: 1000, // 1 second
+      duration: 1000,
       useNativeDriver: false,
     }).start();
   }, []);
@@ -31,12 +43,6 @@ const PhoneNumberScreen = () => {
     Navigation.navigate("PANInputScreen");
     return true;
   };
-
-  // const handleProceed = () => {
-  //   if (validatePhoneNumber()) {
-  //     navigation.navigate('VerifyPhoneNumber', { phoneNumber });
-  //   }
-  // };
 
   const progressWidth = progress.interpolate({
     inputRange: [0, 1],
@@ -64,7 +70,7 @@ const PhoneNumberScreen = () => {
             placeholder="Enter mobile number"
             keyboardType="numeric"
             maxLength={10}
-            value={phoneNumber}
+            value={phoneNumber}  // Show the fetched phone number here
             onChangeText={setPhoneNumber}
           />
         </View>

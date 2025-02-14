@@ -15,7 +15,7 @@
     },
     "ios": {
       "supportsTablet": true
-    },
+    }, 
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
@@ -44,7 +44,10 @@
         "expo-build-properties",
         {
           "android": {
-            "usesCleartextTraffic": true
+            "extraProguardRules": "-keep class com.yourpackage.** { *; }",
+            "manifest": {
+              "android:usesCleartextTraffic": "true"
+            }
           }
         }
       ]
