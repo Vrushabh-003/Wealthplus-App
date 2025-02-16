@@ -8,33 +8,73 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {RootStackParamList} from './index';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp, useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { PieChart } from 'react-native-chart-kit';
+import PieChart from 'react-native-pie-chart'
 
-interface PortfolioData {
-  totalInvested: string;
-  overallGains: string;
-  portfolioXirr: string;
-  benchmarkXirr: string;
-  potentialEarnings: string;
-  analysisSummary: string;
-  beta: string;
-  rSquared: string;
-  sharpeRatio: string;
-}
+
+// interface PortfolioData {
+//   totalInvested: string;
+//   overallGains: string;
+//   portfolioXirr: string;
+//   benchmarkXirr: string;
+//   potentialEarnings: string;
+//   analysisSummary: string;
+//   beta: string;
+//   rSquared: string;
+//   sharpeRatio: string;
+// }
 
 // type RootStackParamList = {
 //   MutualFundsPage: undefined;
 // };
 
 const MutualFundsPage: React.FC = () => {
-  const [portfolioData, setPortfolioData] = useState<PortfolioData | null>(null);
+  // const [portfolioData, setPortfolioData] = useState<PortfolioData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const [Portfoliohealth, setPortfolioHealth] = useState<any>(null);
+  const [Portfoliodetails, setPortfolioDetails] = useState<any>(null);
+  const [Portfolioheader, setPortfolioHeader] = useState<any>(null);
+  const [PortfolioXirrAnalysis, setPortfolioXirrAnalysis] = useState<any>(null);
+  const fetchData = async () => {
+    try {
+
+      const portfolioHeader = await AsyncStorage.getItem('MFPortfolioheader')
+      const portfolioXirrAnalysis = await AsyncStorage.getItem('MFPortfolioXirrAnalysis');
+      const portfolioDetails = await AsyncStorage.getItem('MFPortfoliodetails');
+      const portfolioHealth = await AsyncStorage.getItem('MFPortfoliohealth');
+  
+      console.log("Data from AsyncStorage:");
+      console.log("MFPortfolioXirrAnalysis:", portfolioXirrAnalysis);
+      console.log("MFPortfolioheader:", portfolioHeader);
+      console.log("MFPortfoliodetails:", portfolioDetails);
+      console.log("MFPortfoliohealth:", portfolioHealth);
+  
+      setPortfolioXirrAnalysis(portfolioXirrAnalysis ? JSON.parse(portfolioXirrAnalysis) : {});
+      setPortfolioHeader(portfolioHeader ? JSON.parse(portfolioHeader) : {});
+      setPortfolioDetails(portfolioDetails ? JSON.parse(portfolioDetails) : {});
+      setPortfolioHealth(portfolioHealth ? JSON.parse(portfolioHealth) : {});
+    } catch (error) {
+      console.error("Error fetching data from AsyncStorage:", error);
+    }
+  };
+  
+  
+  useEffect(() => {
+    fetchData();
+  }, []);
+  
+
+
+
+
+
+
 
   // Donut chart data (similar to StockPortfolio)
   
@@ -48,118 +88,137 @@ const MutualFundsPage: React.FC = () => {
     useShadowColorFromDataset: false,
   };
 
-  const parsePercentage = (xirr: string) => {
-    return parseFloat(xirr.replace('%', '').replace('+', ''));
-  };
+  // const parsePercentage = (xirr: string) => {
+  //   return parseFloat(xirr.replace('%', '').replace('+', ''));
+  // };
 
-  useEffect(() => {
-    const fetchPortfolioData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        // Simulate API response with dummy data
-        const response = {
-          data: {
-            totalInvested: "₹1.2Cr",
-            overallGains: "₹28.4L (23.67%)",
-            portfolioXirr: "+15.21%",
-            benchmarkXirr: "+19.55%",
-            potentialEarnings: "₹5.47L",
-            analysisSummary: "Your portfolio shows a balanced mix with strong performers leading the growth.",
-            beta: "1.82",
-            rSquared: "0.76",
-            sharpeRatio: "1.2",
-          },
-        };
-        setPortfolioData(response.data);
-      } catch (err) {
-        setError("Failed to fetch portfolio data. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchPortfolioData = async () => {
+  //     setLoading(true);
+  //     setError(null);
+  //     try {
+  //       // Simulate API response with dummy data
+  //       const response = {
+  //         data: {
+  //           potentialEarnings: "₹5.47L",
+  //           analysisSummary: "Your portfolio shows a balanced mix with strong performers leading the growth.",
+  //           beta: "1.82",
+  //           rSquared: "0.76",
+  //           sharpeRatio: "1.2",
+  //         },
+  //       };
+  //       setPortfolioData(response.data);
+  //     } catch (err) {
+  //       setError("Failed to fetch portfolio data. Please try again later.");
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-    fetchPortfolioData();
-  }, []);
+  //   fetchPortfolioData();
+  // }, []);
 
-  const [Portfoliohealth, setPortfolioHealth] = useState<any>(null);
-  useEffect(() => {
-      const fetchPortfolioStatus = async () => {
-        try {
-          const response = await fetch('http://api.inwealthera.com/api/portfolio/getPortfolioHealth', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              reqId: '15043487',
-              mobile: '+919940615334',
-              type: 'mutual_funds',
-            }),
-          });
-          const data = await response.json();
-          setPortfolioHealth(data);
-          console.log('Portfolio status:', data);
-        } catch (error) {
-          console.error('Error fetching portfolio status:', error);
-        }
-      };
+  // useEffect(() => {
+  //     const fetchPortfolioStatus = async () => {
+  //       try {
+  //         const response = await fetch('http://api.inwealthera.com/api/portfolio/getPortfolioHealth', {
+  //           method: 'POST',
+  //           headers: {
+  //             'Content-Type': 'application/json',
+  //           },
+  //           body: JSON.stringify({
+  //             reqId: '15043487',
+  //             mobile: '+919940615334',
+  //             type: 'mutual_funds',
+  //           }),
+  //         });
+  //         const data = await response.json();
+  //         setPortfolioHealth(data);
+  //         console.log('Portfolio status:', data);
+  //       } catch (error) {
+  //         console.error('Error fetching portfolio status:', error);
+  //       }
+  //     };
   
-      fetchPortfolioStatus();
-    }, []);
+  //     fetchPortfolioStatus();
+  //   }, []);
 
 
-  const [Portfolioheader, setPortfolioHeader] = useState<any>(null);
-  useEffect(() => {
-      const fetchPortfolioStatus = async () => {
-        try {
-          const response = await fetch('http://api.inwealthera.com/api/portfolio/getPortfolioHeader', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              reqId: '15043487',
-              mobile: '+919940615334',
-              type: 'mutual_funds',
-            }),
-          });
-          const data = await response.json();
-          setPortfolioHeader(data);
-          console.log('Portfolio status:', data);
-        } catch (error) {
-          console.error('Error fetching portfolio status:', error);
-        }
-      };
+  // useEffect(() => {
+  //     const fetchPortfolioStatus = async () => {
+  //       try {
+  //         const response = await fetch('http://api.inwealthera.com/api/portfolio/getPortfolioHeader', {
+  //           method: 'POST',
+  //           headers: {
+  //             'Content-Type': 'application/json',
+  //           },
+  //           body: JSON.stringify({
+  //             reqId: '15043487',
+  //             mobile: '+919940615334',
+  //             type: 'mutual_funds',
+  //           }),
+  //         });
+  //         const data = await response.json();
+  //         setPortfolioHeader(data);
+  //         console.log('Portfolio status:', data);
+  //       } catch (error) {
+  //         console.error('Error fetching portfolio status:', error);
+  //       }
+  //     };
   
-      fetchPortfolioStatus();
-    }, []);
+  //     fetchPortfolioStatus();
+  //   }, []);
 
-    const [Portfoliodetails, setPortfolioDetails] = useState<any>(null);
-    useEffect(() => {
-        const fetchPortfolioStatus = async () => {
-          try {
-            const response = await fetch('http://api.inwealthera.com/api/portfolio/getPortfolioDetails', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                reqId: '15043487',
-                mobile: '+919940615334',
-                type: 'mutual_funds',
-              }),
-            });
-            const data = await response.json();
-            setPortfolioDetails(data);
-            console.log('Portfolio status:', data);
-          } catch (error) {
-            console.error('Error fetching portfolio status:', error);
-          }
-        };
+  //   useEffect(() => {
+  //       const fetchPortfolioStatus = async () => {
+  //         try {
+  //           const response = await fetch('http://api.inwealthera.com/api/portfolio/getPortfolioDetails', {
+  //             method: 'POST',
+  //             headers: {
+  //               'Content-Type': 'application/json',
+  //             },
+  //             body: JSON.stringify({
+  //               reqId: '15043487',
+  //               mobile: '+919940615334',
+  //               type: 'mutual_funds',
+  //             }),
+  //           });
+  //           const data = await response.json();
+  //           setPortfolioDetails(data);
+  //           console.log('Portfolio status:', data);
+  //         } catch (error) {
+  //           console.error('Error fetching portfolio status:', error);
+  //         }
+  //       };
     
-        fetchPortfolioStatus();
-      }, []);
+  //       fetchPortfolioStatus();
+  //     }, []);
+
+
+  //     useEffect(() => {
+  //         const fetchPortfolioStatus = async () => {
+  //           try {
+  //             const response = await fetch('http://api.inwealthera.com/api/api/portfolio/getPortfolioXirrAnalysis', {
+  //               method: 'POST',
+  //               headers: {
+  //                 'Content-Type': 'application/json',
+  //               },
+  //               body: JSON.stringify({
+  //                 reqId: '15043487',
+  //                 mobile: '+919940615334',
+  //                 type: 'mutual_funds',
+  //               }),
+  //             });
+  //             const data = await response.json();
+  //             setPortfolioXirrAnalysis(data);
+  //             console.log('Portfolio status:', data);
+  //           } catch (error) {
+  //             console.error('Error fetching portfolio status:', error);
+  //           }
+  //         };
+      
+  //         fetchPortfolioStatus();
+  //       }, []);
 
   // Calculate performance details similar to StockPortfolio
   let greaterValue = 0,
@@ -169,9 +228,9 @@ const MutualFundsPage: React.FC = () => {
     smallerLabel = '';
 
 
-  if (portfolioData) {
-    const portfolioXirrNum = parsePercentage(portfolioData.portfolioXirr);
-    const benchmarkXirrNum = parsePercentage(portfolioData.benchmarkXirr);
+  if (PortfolioXirrAnalysis) {
+    const portfolioXirrNum = Number(PortfolioXirrAnalysis.portfolioXirr);
+    const benchmarkXirrNum = Number(PortfolioXirrAnalysis.benchmarkXirr);
 
     if (portfolioXirrNum >= benchmarkXirrNum) {
       greaterValue = portfolioXirrNum;
@@ -187,7 +246,13 @@ const MutualFundsPage: React.FC = () => {
     difference = greaterValue - smallerValue;
   }
 
-if (loading || !portfolioData || !Portfoliodetails || !Portfolioheader || !Portfoliohealth ) {
+  const isPortfolioXirrGreaterThanBenchmark =
+  PortfolioXirrAnalysis && Number(PortfolioXirrAnalysis.portfolioXirr) > Number(PortfolioXirrAnalysis.benchmarkXirr);
+
+const isBenchmarkXirrGreaterThanPortfolio =
+  PortfolioXirrAnalysis && Number(PortfolioXirrAnalysis.benchmarkXirr) > Number(PortfolioXirrAnalysis.portfolioXirr);
+
+if (loading || !Portfoliodetails || !Portfolioheader || !Portfoliohealth ) {
     return (
       <View style={styles.centerContainer}>
         <ActivityIndicator size="large" color="#aaaaaa" />
@@ -223,39 +288,101 @@ if (loading || !portfolioData || !Portfoliodetails || !Portfolioheader || !Portf
     }
   };
 
+  
+
+  const chartSize = 150; // Define the size of the chart
+  const radius = chartSize / 2; // Calculate the radius of the pie chart
+
+  // const donutData = [
+  //   {
+  //     name: "Buy",
+  //     amount: 100,
+  //     color: "#28A745",
+  //     legendFontColor: "#7F7F7F",
+  //     legendFontSize: 12,
+  //   },
+  //   {
+  //     name: "Hold",
+  //     amount: 700,
+  //     color: "#F57C00",
+  //     legendFontColor: "#7F7F7F",
+  //     legendFontSize: 12,
+  //   },
+  //   {
+  //     name: "Sell",
+  //     amount: 150,
+  //     color: "#DC3545",
+  //     legendFontColor: "#7F7F7F",
+  //     legendFontSize: 12,
+  //   },
+  // ];
+
   const donutData = [
     {
-      name: "Buy",
+      name: "Buy\n₹"+formatNumber(Portfoliohealth?.Buy?.currentMktValue)+" ("+Portfoliohealth?.Buy?.fundCount+' funds)',
       amount: Number(Portfoliohealth?.Buy?.currentMktValue),
       color: "#28A745",
       legendFontColor: "#7F7F7F",
       legendFontSize: 12,
     },
     {
-      name: "Hold",
+      name: "Hold\n₹"+formatNumber(Portfoliohealth?.Hold?.currentMktValue)+"\n("+Portfoliohealth?.Hold?.fundCount+' funds)',
       amount: Number(Portfoliohealth?.Hold?.currentMktValue),
       color: "#F57C00",
       legendFontColor: "#7F7F7F",
       legendFontSize: 12,
     },
     {
-      name: "Sell",
+      name: "Sell\n₹"+formatNumber(Portfoliohealth?.Sell?.currentMktValue)+"\n("+Portfoliohealth?.Sell?.fundCount+' funds)',
       amount: Number(Portfoliohealth?.Sell?.currentMktValue),
       color: "#DC3545",
       legendFontColor: "#7F7F7F",
       legendFontSize: 12,
     },
   ];
+
+  //, label: { text: "SELL", offsetY: 20, offsetX: 20, fontSize: 16, fontStyle: 'italic', outline: 'white'}},
   
+
+  const series = [
+    { value: Number(Portfoliohealth?.Buy?.currentMktValue), color: '#28A745'  },
+    { value: Number(Portfoliohealth?.Hold?.currentMktValue), color: '#F57C00' },
+    { value: Number(Portfoliohealth?.Sell?.currentMktValue), color: '#DC3545'}
+  ] 
+
+  // const series = [
+  //   { value: 100, color: '#28A745'  },
+  //   { value: 700, color: '#F57C00' },
+  //   { value: 150, color: '#DC3545'}
+  // ] 
   const totalAmount = donutData.reduce((sum, item) => sum + item.amount, 0);
 
+  // Function to calculate position for label based on angle
+  // const getLabelPosition = (angle : any, radius: any) => {
+  //   const radians = (angle - 90) * (Math.PI / 180); // Convert angle to radians
+  //   const x = radius * Math.cos(radians); // X coordinate
+  //   const y = radius * Math.sin(radians); // Y coordinate
+  //   return { x, y };
+  // };
+
+  // // Function to ensure the label stays within the bounds of the screen
+  // const clampPosition = (x: any, y: any, radius: any) => {
+  //   // Clamp x and y position to avoid exceeding the screen size
+  //   const clampedX = Math.min(Math.max(x, -radius), radius);
+  //   const clampedY = Math.min(Math.max(y, -radius), radius);
+  //   return { clampedX, clampedY };
+  // };
+
+  const mfdiff=(difference/100)*Portfolioheader.currentMktValue
+
+ 
  
 
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.logotitle}>WealthPlus</Text>
+        <Text style={styles.logo}>Wealthplus</Text>
       </View>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.navigate('Dashboard')}>
@@ -264,11 +391,12 @@ if (loading || !portfolioData || !Portfoliodetails || !Portfolioheader || !Portf
         <Text style={styles.title}>Mutual Funds</Text>
       </View>
 
-      {portfolioData && Portfoliodetails && Portfolioheader && Portfoliohealth && (
+      {Portfoliodetails && Portfolioheader && Portfoliohealth && (
         <>
           {/* Investment Summary */}
           <View style={styles.card}>
             <Text style={styles.subTitle}>Updated as of {Portfolioheader.navDate}</Text>
+            <Text style={styles.subTitle}>Current Value</Text>
             <Text style={styles.cardTitle}>₹{formatNumber(Portfolioheader.currentMktValue)}</Text>
             <View style={styles.rowContainer}>
               <View>
@@ -283,67 +411,243 @@ if (loading || !portfolioData || !Portfoliodetails || !Portfolioheader || !Portf
           </View>
 
           {/* Performance Section (Updated to match StockPortfolio) */}
+
+          
+
+          
+         
+     
+
           <View style={styles.card}>
-            <Text style={styles.headerText}>How did your portfolio perform?</Text>
-            <View style={styles.newPerformanceContainer}>
-              <View style={styles.leftBlock}>
-                <Text style={styles.largerText}>{`${greaterValue.toFixed(2)}%`}</Text>
-                <Text style={styles.blockLabel}>{greaterLabel}</Text>
-              </View>
-              <View style={styles.rightContainer}>
-                <View style={styles.topRightBlock}>
-                  <Text style={styles.performanceText}>{`+${difference.toFixed(2)}%`}</Text>
-                  <Text style={styles.blockLabel}>Difference</Text>
-                </View>
-                <View style={styles.bottomRightBlock}>
-                  <Text style={styles.performanceText}>{`${smallerValue.toFixed(2)}%`}</Text>
-                  <Text style={styles.blockLabel}>{smallerLabel}</Text>
-                </View>
-              </View>
-            </View>
-            <Text style={styles.cardNote}>
-              Your portfolio could have potentially earned {portfolioData.potentialEarnings} more with active investing
-            </Text>
-          </View>
+  <Text style={styles.headerText}>How did your portfolio perform?</Text>
 
-          {/* Analysis Section (Updated to match StockPortfolio) */}
-          <View style={styles.analysisSection}>
-            <Text style={styles.headerText}>Mutual Fund Analysis</Text>
-            <View style={styles.graphContainer}>
-              <PieChart
-                data={donutData}
-                width={screenWidth * 0.9}
-                height={220}
-                chartConfig={chartConfig}
-                accessor="amount"
-                backgroundColor="transparent"
-                paddingLeft="90"
-                absolute
-                hasLegend={false}
-              />
-              <View style={styles.donutCenter}>
-                <Text style={styles.donutCenterText}>Analysis</Text>
-              </View>
-            </View>
+  {isPortfolioXirrGreaterThanBenchmark  && (
+      <View style={styles.newPerformanceContainer}>
+      {/* Left Block (Portfolio or Benchmark XIRR) */}
+      <View style={styles.leftBlock}>
+        <Text style={styles.largerText}>
+          {`+${(
+            isPortfolioXirrGreaterThanBenchmark
+              ? PortfolioXirrAnalysis.portfolioXirr
+              : PortfolioXirrAnalysis.benchmarkXirr
+          ).toFixed(2)}%`}
+        </Text>
+        <Text style={styles.blockLabel}>
+          {isPortfolioXirrGreaterThanBenchmark ? 'Portfolio XIRR' : 'Benchmark XIRR'}
+        </Text>
+      </View>
+  
+      {/* Right Container (Difference, Portfolio XIRR, Benchmark XIRR) */}
+      <View style={styles.rightContainer}>
+        {/* Difference Container */}
+        <View
+          style={[
+            styles.topRightBlockp,
+            {
+              height: Math.max(
+                40,
+                (difference / Math.max(PortfolioXirrAnalysis.portfolioXirr, PortfolioXirrAnalysis.benchmarkXirr)) * 100
+              ),
+            },
+          ]}
+        >
+          <Text style={styles.performanceText}>{`+${difference.toFixed(2)}%`}</Text>
+          <Text style={styles.blockLabel}>Difference</Text>
+        </View>
+  
+        {/* Portfolio XIRR Container */}
+        <View
+          style={[
+            styles.bottomRightBlock,
+            {
+              height: Math.max(
+                40,
+                (PortfolioXirrAnalysis.portfolioXirr / Math.max(PortfolioXirrAnalysis.portfolioXirr, PortfolioXirrAnalysis.benchmarkXirr)) * 100
+              ),
+            },
+          ]}
+        >
+          <Text style={styles.performanceText}>{`${PortfolioXirrAnalysis.portfolioXirr.toFixed(2)}%`}</Text>
+          <Text style={styles.blockLabel}>Portfolio XIRR</Text>
+        </View>
+  
+        {/* Benchmark XIRR Container */}
+        {/* <View
+          style={[
+            styles.bottomRightBlock,
+            {
+              height: Math.max(
+                30,
+                (PortfolioXirrAnalysis.benchmarkXirr / Math.max(PortfolioXirrAnalysis.portfolioXirr, PortfolioXirrAnalysis.benchmarkXirr)) * 100
+              ),
+            },
+          ]}
+        >
+          <Text style={styles.performanceText}>{`${PortfolioXirrAnalysis.benchmarkXirr.toFixed(2)}%`}</Text>
+          <Text style={styles.blockLabel}>Benchmark XIRR</Text>
+        </View> */}
+        
+      </View>
+      
+    </View>
+    ) }
+    {isBenchmarkXirrGreaterThanPortfolio  && (
+      <View style={styles.newPerformanceContainer}>
 
-            {/* Legends */}
-            <View style={styles.legendContainer}>
-            {donutData.map((item, index) => {
-              const percentage = totalAmount > 0 ? ((item.amount / totalAmount) * 100).toFixed(2) : "0.00";
+        
+      
+  
+      {/* Right Container (Difference, Portfolio XIRR, Benchmark XIRR) */}
+      <View style={styles.rightContainer}>
+        {/* Difference Container */}
+        <View
+          style={[
+            styles.topRightBlockn,
+            {
+              height: Math.max(
+                40,
+                (difference / Math.max(PortfolioXirrAnalysis.portfolioXirr, PortfolioXirrAnalysis.benchmarkXirr)) * 100
+              ),
+            },
+          ]}
+        >
+          <Text style={styles.performanceText}>{`+${difference.toFixed(2)}%`}</Text>
+          <Text style={styles.blockLabel}>Difference</Text>
+        </View>
+  
+        {/* Portfolio XIRR Container */}
+        <View
+          style={[
+            styles.bottomRightBlock,
+            {
+              height: Math.max(
+                40,
+                (PortfolioXirrAnalysis.portfolioXirr / Math.max(PortfolioXirrAnalysis.portfolioXirr, PortfolioXirrAnalysis.benchmarkXirr)) * 100
+              ),
+            },
+          ]}
+        >
+          <Text style={styles.performanceText}>{`${PortfolioXirrAnalysis.portfolioXirr.toFixed(2)}%`}</Text>
+          <Text style={styles.blockLabel}>Portfolio XIRR</Text>
+        </View>
+        
+  
+        {/* Benchmark XIRR Container */}
+        {/* <View
+          style={[
+            styles.bottomRightBlock,
+            {
+              height: Math.max(
+                30,
+                (PortfolioXirrAnalysis.benchmarkXirr / Math.max(PortfolioXirrAnalysis.portfolioXirr, PortfolioXirrAnalysis.benchmarkXirr)) * 100
+              ),
+            },
+          ]}
+        >
+          <Text style={styles.performanceText}>{`${PortfolioXirrAnalysis.benchmarkXirr.toFixed(2)}%`}</Text>
+          <Text style={styles.blockLabel}>Benchmark XIRR</Text>
+        </View> */}
+        
+      </View>
 
-              return (
-                <View key={index} style={styles.legendItem}>
-                  <View style={[styles.legendColor, { backgroundColor: item.color }]} />
-                  <Text style={styles.legendText}>{`${item.name} (${percentage}%)`}</Text>
-                </View>
-              );
-            })}
-          </View>
+      {/* Left Block (Portfolio or Benchmark XIRR) */}
+      <View style={styles.leftBlock}>
+        <Text style={styles.largerText}>
+          {`+${(
+            isPortfolioXirrGreaterThanBenchmark
+              ? PortfolioXirrAnalysis.portfolioXirr
+              : PortfolioXirrAnalysis.benchmarkXirr
+          ).toFixed(2)}%`}
+        </Text>
+        <Text style={styles.blockLabel}>
+          {isPortfolioXirrGreaterThanBenchmark ? 'Portfolio XIRR' : 'Benchmark XIRR'}
+        </Text>
+      </View>
+      
+    </View>
+    ) }
+  {isBenchmarkXirrGreaterThanPortfolio && (
+    <Text style={styles.negativecardNote}>
+    Your portfolio could have potentially earned more ₹{formatNumber(String(mfdiff))} with active investing
+  </Text> 
+  )}
+  {isPortfolioXirrGreaterThanBenchmark && (
+    <Text style={styles.positivecardNote}>
+    Your portfolio have earned ₹{formatNumber(String(mfdiff))} more than Benchmark XIRR
+  </Text> 
+  )}
+  
+</View>
 
-            <Text style={styles.subTitle}>{portfolioData.analysisSummary}</Text>
-            <Text style={styles.subTitle}>Consider rebalancing low-performing funds to optimize returns.</Text>
-          </View>
 
+
+
+
+<View style={styles.analysisSection}>
+<TouchableOpacity onPress={() => navigation.navigate('DetailedAnalysis')}>
+  <Text style={styles.headerText}>Mutual Fund Analysis</Text>
+    <View style={styles.graphContainer}>
+      <PieChart
+        series={series}
+        widthAndHeight={170}
+        cover={0.65}
+      />
+    </View>
+  
+
+  {/* Labels near PieChart Sections */}
+  <View style={styles.labelContainer}>
+    {donutData.map((item, index) => {
+      // Calculate the cumulative percentage for the current item
+      const totalAmount = donutData.reduce((sum, data) => sum + data.amount, 0);
+      const cumulativePercentage = donutData
+        .slice(0, index + 1)
+        .reduce((sum, data) => sum + (data.amount / totalAmount), 0);
+
+      // Calculate the midpoint angle for the current section
+      const midAngle = cumulativePercentage * 360 - (item.amount / totalAmount / 2) * 360;
+
+      // Convert the angle to radians
+      const radians = (midAngle - 90) * (Math.PI / 180);
+
+      // Calculate the x and y coordinates for the label
+      const radius = 175; // Half of widthAndHeight (250 / 2)
+      const labelDistance = radius * 0.62; // Distance from the center for the label
+      const x = labelDistance * Math.cos(radians);
+      const y = labelDistance * Math.sin(radians);
+
+      // Adjust the label position relative to the pie chart's center
+      const centerX = 90; // Half of widthAndHeight (250 / 2)
+      const centerY = 90; // Half of widthAndHeight (250 / 2)
+      const topPosition = centerY + y; // Adjust for text height
+      const leftPosition = centerX + x-5; // Adjust for text width
+
+      if (item.amount==0){
+        return null;
+      }
+
+      return (
+        <Text
+          key={index}
+          style={[
+            styles.pieLabel,
+            {
+              position: 'absolute',
+              top: topPosition,
+              left: leftPosition,
+              color: item.color,
+            },
+          ]}
+        >
+          {item.name}
+        </Text>
+      );
+    })}
+  </View>
+  </TouchableOpacity>
+
+  <Text style={styles.subTitle}>Consider rebalancing low-performing funds to optimize returns.</Text>
+</View>
           {/* Metrics Section */}
           <View style={styles.card}>
             <View style={styles.header}>
@@ -351,17 +655,17 @@ if (loading || !portfolioData || !Portfoliodetails || !Portfolioheader || !Portf
             </View>
             <View style={styles.metricsContainer}>
               <View style={[styles.metricCard, styles.betaCard]}>
-                <Text style={styles.metricValue}>{portfolioData.beta}</Text>
+                <Text style={styles.metricValue}>{Portfoliodetails.beta}</Text>
                 <Text style={styles.metricTitle}>Beta</Text>
                 <Text style={styles.metricSubtitle}>Volatility</Text>
               </View>
               <View style={[styles.metricCard, styles.rSquaredCard]}>
-                <Text style={styles.metricValue}>{portfolioData.rSquared}</Text>
+                <Text style={styles.metricValue}>{Portfoliodetails.rSquared}</Text>
                 <Text style={styles.metricTitle}>R-squared</Text>
                 <Text style={styles.metricSubtitle}>Correlation</Text>
               </View>
               <View style={[styles.metricCard, styles.sharpeCard]}>
-                <Text style={styles.metricValue}>{portfolioData.sharpeRatio}</Text>
+                <Text style={styles.metricValue}>{Portfoliodetails.sharpeRatio}</Text>
                 <Text style={styles.metricTitle}>Sharpe ratio</Text>
                 <Text style={styles.metricSubtitle}>Return per risk</Text>
               </View>
@@ -405,6 +709,12 @@ const styles = StyleSheet.create({
     fontWeight: 500,
     flex: 1,
   },
+  logo: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#7D4CED",
+    textAlign: "center",
+  },
   logotitle: {
     fontSize: 28,
     color: '#3b3b3b',
@@ -444,9 +754,13 @@ const styles = StyleSheet.create({
     color: '#4caf50',
     fontWeight: '600',
   },
-  cardNote: {
+  negativecardNote: {
     fontSize: 16,
     color: '#ee2222',
+  },
+  positivecardNote: {
+    fontSize: 16,
+    color: '#22ee22',
   },
   // Performance Section styles (matching StockPortfolio)
   newPerformanceContainer: {
@@ -456,7 +770,6 @@ const styles = StyleSheet.create({
   leftBlock: {
     flex: 1.5,
     backgroundColor: '#ecfdf5',
-    height: 100,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 10,
@@ -465,10 +778,17 @@ const styles = StyleSheet.create({
   rightContainer: {
     flex: 1,
     justifyContent: 'space-between',
+    margin:2
   },
-  topRightBlock: {
-    backgroundColor: '#fef4e8',
-    height: 45,
+  topRightBlockp: {
+    backgroundColor: '#22ff2266',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+    marginBottom: 5,
+  },
+  topRightBlockn: {
+    backgroundColor: '#E3071D27',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
@@ -476,7 +796,6 @@ const styles = StyleSheet.create({
   },
   bottomRightBlock: {
     backgroundColor: '#ecfdf5',
-    height: 45,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
@@ -603,6 +922,30 @@ const styles = StyleSheet.create({
   sharpeCard: {
     backgroundColor: '#ecfdf5',
   },
+  labelContainer: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: [{ translateX: '-50%' }, { translateY: '-50%' }],
+    width: 250,
+    height: 250,
+  },
+  pieLabel: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  // touchableArea: {
+  //   marginTop: 5,
+  //   backgroundColor: '#007bff',
+  //   padding: 8,
+  //   borderRadius: 5,
+  // },
+  // touchableText: {
+  //   color: '#fff',
+  //   fontSize: 14,
+  //   fontWeight: 'bold',
+  // },
 });
 
 export default MutualFundsPage;

@@ -1,8 +1,10 @@
-import React, { useEffect, useCallback } from 'react';
-import { View,ScrollView, Text, StyleSheet, TouchableOpacity, BackHandler,  Alert } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View,ScrollView, Text, StyleSheet, TouchableOpacity, BackHandler,  Alert, ActivityIndicator } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { RootStackParamList } from './index'; // Adjust the import path as needed
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 // Define the navigation prop type
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Dashboard'>;
@@ -11,36 +13,70 @@ const Dashboard = () => {
   // Use the correct navigation prop type
   const navigation = useNavigation<NavigationProp>();
   const [data, setData] = React.useState();
+  const [loading, setLoading] = useState(true);
   const [Portfoliostatus, setPortfolioStatus] = React.useState();
 
-  //API integration
+  const [Portfoliohealth, setPortfolioHealth] = useState<any>(null);
+  const [Portfoliodetails, setPortfolioDetails] = useState<any>(null);
+  const [Portfolioheader, setPortfolioHeader] = useState<any>(null);
+  const [PortfolioXirrAnalysis, setPortfolioXirrAnalysis] = useState<any>(null);
+  const fetchData = async () => {
+    try {
+      const portfolioXirrAnalysis = await AsyncStorage.getItem('MFPortfolioXirrAnalysis');
+      const portfolioHeader = await AsyncStorage.getItem('MFPortfolioheader');
+      const portfolioDetails = await AsyncStorage.getItem('MFPortfoliodetails');
+      const portfolioHealth = await AsyncStorage.getItem('MFPortfoliohealth');
+  
+      console.log('Fetched Data:', { portfolioXirrAnalysis, portfolioHeader, portfolioDetails, portfolioHealth });
+  
+      // Check if data is valid before updating state
+      const parsedXirr = portfolioXirrAnalysis ? JSON.parse(portfolioXirrAnalysis) : {};
+      const parsedHeader = portfolioHeader ? JSON.parse(portfolioHeader) : {};
+      const parsedDetails = portfolioDetails ? JSON.parse(portfolioDetails) : {};
+      const parsedHealth = portfolioHealth ? JSON.parse(portfolioHealth) : {};
+  
+      console.log('Parsed Data:', { parsedXirr, parsedHeader, parsedDetails, parsedHealth });
+  
+      // Update state only if parsed data is valid
+      setPortfolioXirrAnalysis(parsedXirr);
+      setPortfolioHeader(parsedHeader);
+      setPortfolioDetails(parsedDetails);
+      setPortfolioHealth(parsedHealth);
+  
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching data from AsyncStorage:', error);
+      setLoading(false);  // Ensure loading is stopped even in case of error
+    }
+  };
+  
+  
+  
+
+
+  const formatNumber = (num: string) => {
+    const number = parseFloat(num);  // Convert the string to a number
+  
+    if (isNaN(number)) return "Invalid value"; // Return if it's not a valid number
+  
+    if (number >= 10000000) {
+      // For Crores (10 million and above)
+      return (number / 10000000).toFixed(2) + 'Cr'; // Keeping 2 decimals for Cr
+    } else if (number >= 100000) {
+      // For Lakhs (100 thousand and above)
+      return (number / 100000).toFixed(2) + 'L'; // Keeping 2 decimals for L
+    } else if (number >= 1000) {
+      // For Thousands
+      return (number / 1000).toFixed(2) + 'K'; // Keeping 2 decimals for K
+    } else {
+      return number.toString(); // For smaller numbers
+    }
+  };
+
+
   useEffect(() => {
-    const fetchPortfolioStatus = async () => {
-      try {
-        const response = await fetch('http://api.inwealthera.com/api/portfolio/getPortfolioAnalysisReadyStatus', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            reqId: '15043487',
-            mobile: '+919940615334',
-            type: 'mutual_funds',
-          }),
-        });
-        const data = await response.json();
-        setPortfolioStatus(data);
-        console.log('Portfolio status:', data);
-      } catch (error) {
-        console.error('Error fetching portfolio status:', error);
-      }
-    };
-
-    fetchPortfolioStatus();
+    fetchData();
   }, []);
-
-
-
 
   useFocusEffect(
     useCallback(() => {
@@ -57,6 +93,48 @@ const Dashboard = () => {
     }, [])
   );
 
+  if (loading || !PortfolioXirrAnalysis || !Portfoliodetails ||!Portfolioheader ||!Portfoliohealth){
+    return(
+      <View style={styles.centerContainer}>
+              <ActivityIndicator size="large" color="#aaaaaa" />
+      </View>
+
+    );
+  }
+  
+  const isPortfolioXirrGreaterThanBenchmark =
+  PortfolioXirrAnalysis && Number(PortfolioXirrAnalysis.portfolioXirr) > Number(PortfolioXirrAnalysis.benchmarkXirr);
+
+  const isBenchmarkXirrGreaterThanPortfolio =
+  PortfolioXirrAnalysis && Number(PortfolioXirrAnalysis.benchmarkXirr) > Number(PortfolioXirrAnalysis.portfolioXirr);
+
+  let greaterValue = 0,
+  smallerValue = 0,
+  difference = 0,
+  greaterLabel = '',
+  smallerLabel = '';
+
+  if (PortfolioXirrAnalysis) {
+    const portfolioXirrNum = Number(PortfolioXirrAnalysis.portfolioXirr);
+    const benchmarkXirrNum = Number(PortfolioXirrAnalysis.benchmarkXirr);
+
+    if (portfolioXirrNum >= benchmarkXirrNum) {
+      greaterValue = portfolioXirrNum;
+      smallerValue = benchmarkXirrNum;
+      greaterLabel = "Portfolio XIRR";
+      smallerLabel = "Benchmark XIRR";
+    } else {
+      greaterValue = benchmarkXirrNum;
+      smallerValue = portfolioXirrNum;
+      greaterLabel = "Benchmark XIRR";
+      smallerLabel = "Portfolio XIRR";
+    }
+    difference = greaterValue - smallerValue;
+  }
+
+  const mfdiff=(difference/100)*Portfolioheader.currentMktValue;
+  const mfcount = Portfoliohealth?.Buy?.fundCount +Portfoliohealth?.Hold?.fundCount+Portfoliohealth?.Sell?.fundCount;
+
   return (
     <ScrollView style={styles.container}>
       {/* Header */}
@@ -70,23 +148,23 @@ const Dashboard = () => {
       {/* Portfolio Overview */}
       <View style={styles.portfolio}>
         <Text style={styles.assetsText}>Your Assets</Text>
-        <Text style={styles.totalAssets}>₹2.43Cr</Text>
+        <Text style={styles.totalAssets}>₹{formatNumber(Portfolioheader.currentMktValue)}</Text>
 
         <View style={styles.rowContainer}>
           <View style={styles.gainsContainer}>
               <Text style={styles.subText}>Total Invested</Text>
-              <Text style={styles.amount}>₹1.89Cr</Text>
+              <Text style={styles.amount}>₹{formatNumber(Portfolioheader.costValue)}</Text>
           </View> 
           <View style={styles.gainsContainer}>
               <Text style={styles.gainsLabel}>Overall Gains</Text>
-              <Text style={styles.gains}>₹54L (28.5%)</Text>
+              <Text style={styles.gains}>₹{(formatNumber(Portfolioheader.gainLoss))+" ("+(Portfolioheader.gainLossPercentage)+")%"}</Text>
           </View>
         </View>
         {/* Portfolio XIRR and Overall Gains in a row */}
         <View style={styles.rowContainer}>
           <View>
             <Text style={styles.subText}>Portfolio XIRR</Text>
-            <Text style={styles.xirr}>21.2%</Text>
+            <Text style={styles.xirr}>{(PortfolioXirrAnalysis.portfolioXirr)+"%"}</Text>
           </View>
           
         </View>
@@ -98,10 +176,12 @@ const Dashboard = () => {
         onPress={() => navigation.navigate('MutualFundsPage')} // Navigate to MutualFundsPage
       >
         <Text style={styles.sectionTitle}>📅 Mutual Funds</Text>
-        <Text style={styles.sectionSubtitle}>19 Funds</Text>
-        <Text style={styles.amountRight}>₹1.61Cr</Text>
-        <Text style={styles.performancePositive}>₹10L of outperformance vs benchmark</Text>
-        
+        <Text style={styles.sectionSubtitle}>{mfcount} Funds</Text>
+        <Text style={styles.amountRight}>₹{formatNumber(Portfolioheader.currentMktValue)}</Text>
+
+{  isPortfolioXirrGreaterThanBenchmark &&      (<Text style={styles.performancePositive}>₹{(formatNumber(String(mfdiff)))} of outperformance vs benchmark</Text>)}        
+{  isBenchmarkXirrGreaterThanPortfolio &&      (<Text style={styles.performanceNegative}>₹{(formatNumber(String(mfdiff)))} of underperformance vs benchmark</Text>)}        
+    
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -109,9 +189,9 @@ const Dashboard = () => {
         onPress={() => navigation.navigate('StockPortfolio')} // Navigate to StockPortfolio
       >
         <Text style={styles.sectionTitle}>📈 Stocks</Text>
-        <Text style={styles.sectionSubtitle}>51 Stocks</Text>
-        <Text style={styles.amountRight}>₹82.3L</Text>
-        <Text style={styles.performanceNegative}>₹8.55L of missed gains vs benchmark</Text>
+        <Text style={styles.sectionSubtitle}>0 Stocks</Text>
+        <Text style={styles.amountRight}>₹0.00</Text>
+        <Text style={styles.performancePositive}>₹0.00 of missed gains vs benchmark</Text>
       </TouchableOpacity>
 
       {/* Portfolio Health */}
@@ -121,6 +201,7 @@ const Dashboard = () => {
         <Text style={styles.healthPoint}>✅ Consistent outperformance vs benchmark</Text>
       </View>
     </ScrollView>
+    
   );
 };
 
@@ -201,6 +282,12 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 14,
     color: '#777',
+  },
+  centerContainer: {
+    flex: 1,
+    color: '#777777',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   gains: {
     fontSize: 18,

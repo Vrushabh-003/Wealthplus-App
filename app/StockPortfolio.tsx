@@ -144,7 +144,7 @@ const StockPortfolio: React.FC = () => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.logotitle}>WealthPlus</Text>
+        <Text style={styles.logo}>Wealthplus</Text>
       </View>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.navigate('Dashboard')}>
@@ -161,11 +161,11 @@ const StockPortfolio: React.FC = () => {
             <View style={styles.rowContainer}>
               <View>
                 <Text style={styles.subTitle}>Total Invested</Text>
-                <Text style={styles.cardText}>{portfolioData.totalInvested}</Text>
+                <Text style={styles.cardText}>₹{portfolioData.totalInvested}</Text>
               </View>
               <View>
                 <Text style={styles.subTitle}>Overall Gains</Text>
-                <Text style={styles.cardText}>{portfolioData.overallGains}</Text>
+                <Text style={styles.cardText}>₹{portfolioData.overallGains}</Text>
               </View>
             </View>
           </View>
@@ -284,6 +284,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 500,
     flex: 1,
+  },
+  logo: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#7D4CED",
+    textAlign: "center",
   },
   logotitle: {
     fontSize: 28,

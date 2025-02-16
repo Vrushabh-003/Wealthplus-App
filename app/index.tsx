@@ -15,6 +15,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Dashboard from "./Dashboard";
 import MutualFundsPage from "./MutualFundsPage";
 import StockPortfolio from "./StockPortfolio";
+import DetailedAnalysis from "./DetailedAnalysis";
 import { Header } from "react-native/Libraries/NewAppScreen";
 
 export type RootStackParamList = {
@@ -26,6 +27,7 @@ export type RootStackParamList = {
   Dashboard: undefined;
   MutualFundsPage: undefined;
   StockPortfolio: undefined;
+  DetailedAnalysis: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -42,6 +44,7 @@ export default function App() {
       <Stack.Screen name="Dashboard" component={Dashboard}  options={{headerShown:false}}/>
       <Stack.Screen name="MutualFundsPage" component={MutualFundsPage} options={{headerShown:false}}/>
       <Stack.Screen name="StockPortfolio" component={StockPortfolio} options={{headerShown:false}}/>
+      <Stack.Screen name="DetailedAnalysis" component={DetailedAnalysis} options={{headerShown:false}}/>
     </Stack.Navigator>
   );
 }
