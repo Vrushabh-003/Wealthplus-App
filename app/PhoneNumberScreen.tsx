@@ -1,46 +1,60 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Animated } from "react-native";
 import { RootStackParamList } from "./index";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import RNSimData from 'react-native-sim-data';  // Import the library to fetch SIM data
+import SmsRetriever from "react-native-sms-retriever"; // ✅ Import SmsRetriever
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, "PhoneNumberScreen">;
 
 const PhoneNumberScreen = () => {
-  const Navigation = useNavigation<NavigationProp>();
-  const [phoneNumber, setPhoneNumber] = useState("9940615334");
-  const [progress, setProgress] = useState(new Animated.Value(0));
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp>();
+  const [phoneNumber, setPhoneNumber] = useState(""); // ✅ State for phone number
+  const progress = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    // Fetch the phone number from the SIM card (if available)
-    try {
-      const simInfo = RNSimData.getSimInfo();  // Fetch SIM data
-      console.log(simInfo);  // Log the result to inspect available properties
+    fetchPhoneNumber(); // ✅ Auto-fetch phone number when the screen loads
 
-      // Check for the first SIM card's phone number
-      if (simInfo && simInfo.phoneNumber0) {
-        setPhoneNumber(simInfo.phoneNumber0);  // Set the phone number for the first SIM slot
-      }
-    } catch (error) {
-      console.error("Error fetching phone number:", error);
-    }
-
-    // Animate progress bar
     Animated.timing(progress, {
       toValue: 0.25,
       duration: 1000,
-      useNativeDriver: false,
+      useNativeDriver: true,
     }).start();
   }, []);
+
+  // ✅ Auto-retrieve phone number
+  const fetchPhoneNumber = async () => {
+    try {
+      const number = await SmsRetriever.requestPhoneNumber();
+      if (number) {
+        setPhoneNumber(number.replace("+91", "").trim()); // ✅ Remove country code if needed
+      }
+    } catch (error) {
+      console.log("Error fetching phone number:", error);
+    }
+  };
+
+  // ✅ SMS Listener (useful for OTP auto-read)
+  const startSmsListener = async () => {
+    try {
+      const registered = await SmsRetriever.startSmsRetriever();
+      if (registered) {
+        SmsRetriever.addSmsListener((event) => {
+          console.log("Received SMS:", event.message);
+          SmsRetriever.removeSmsListener();
+        });
+      }
+    } catch (error) {
+      console.log("Error starting SMS listener:", error);
+    }
+  };
 
   const validatePhoneNumber = () => {
     if (phoneNumber.length < 10) {
       alert("Phone number must be at least 10 digits.");
       return false;
     }
-    Navigation.navigate("PANInputScreen");
+    navigation.navigate("PANInputScreen");
     return true;
   };
 
@@ -51,15 +65,12 @@ const PhoneNumberScreen = () => {
 
   return (
     <View style={styles.container}>
-      {/* Logo */}
       <Text style={styles.logo}>Wealthplus</Text>
 
-      {/* Progress Bar */}
       <View style={styles.progressBarContainer}>
         <Animated.View style={[styles.progressBar, { width: progressWidth }]} />
       </View>
 
-      {/* Form */}
       <View style={styles.formContainer}>
         <Text style={styles.title}>Enter phone number</Text>
         <Text style={styles.subtitle}>linked to your PAN</Text>
@@ -70,14 +81,18 @@ const PhoneNumberScreen = () => {
             placeholder="Enter mobile number"
             keyboardType="numeric"
             maxLength={10}
-            value={phoneNumber}  // Show the fetched phone number here
-            onChangeText={setPhoneNumber}
+            value={phoneNumber}  // ✅ Auto-filled from SmsRetriever
+            onChangeText={setPhoneNumber}  // ✅ Allows manual input
           />
         </View>
         <TouchableOpacity style={styles.button} onPress={validatePhoneNumber}>
           <Text style={styles.buttonText}>Proceed →</Text>
         </TouchableOpacity>
       </View>
+
+      <TouchableOpacity style={styles.smsButton} onPress={startSmsListener}>
+        <Text style={styles.smsButtonText}>Start SMS Listener</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -156,6 +171,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#FFFFFF",
     fontWeight: "bold",
+  },
+  smsButton: {
+    marginTop: 10,
+    backgroundColor: "#E0E0E0",
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  smsButtonText: {
+    fontSize: 14,
+    color: "#333333",
   },
 });
 
