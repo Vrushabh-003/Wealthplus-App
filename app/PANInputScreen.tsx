@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Animated } from "react-native";
+import { 
+  View, Text, TextInput, TouchableOpacity, 
+  StyleSheet, Animated, ActivityIndicator, Alert 
+} from "react-native";
 import { RootStackParamList } from "./index";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from '@react-navigation/native';
@@ -7,13 +10,14 @@ import { useNavigation } from '@react-navigation/native';
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, "PhoneNumberScreen">;
 
 const PANInputScreen = () => {
-  const navigation = useNavigation<NavigationProp>(); // Use the NavigationProp type here
+  const navigation = useNavigation<NavigationProp>();
 
   const [panNumber, setPanNumber] = useState("ABCDE1234H");
+  const [mobileNumber] = useState("+919550755111"); // Static mobile number for now
+  const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(new Animated.Value(0));
 
   useEffect(() => {
-    // Animate progress bar
     Animated.timing(progress, {
       toValue: 0.5,
       duration: 1000, // 1 second
@@ -22,22 +26,46 @@ const PANInputScreen = () => {
   }, []);
 
   const validatePAN = () => {
-    // PAN format: 5 uppercase letters, 4 digits, 1 uppercase letter
     const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
     if (!panRegex.test(panNumber)) {
-      alert("Invalid PAN format. Please enter a valid PAN (e.g., ABCDE1234F).");
+      Alert.alert("Invalid PAN", "Please enter a valid PAN (e.g., ABCDE1234F).");
       return false;
     }
     return true;
   };
 
-  const handleProceed = () => {
-    if (validatePAN()) {
-      // alert("PAN number is valid. Proceeding...");
-      navigation.navigate("OTPScreen");
-      //<TouchableOpacity style={styles.button} onPress={() => Navigation.navigate("PANInputScreen")}>
-              //   <Text style={styles.buttonText}>Proceed →</Text>
-              // </TouchableOpacity>
+  const handleProceed = async () => {
+    if (!validatePAN()) return;
+
+    setLoading(true);
+
+    try {
+      const response = await fetch("https://api.wealthplus.com/mfcentral/generate-otp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          pan: panNumber,
+          mobile: mobileNumber,
+          fromDate: "01-Jan-2021", // Replace with actual date if needed
+          toDate: "07-Jan-2021", // Replace with actual date if needed
+        }),
+      });
+
+      const data = await response.json();
+      setLoading(false);
+
+      if (response.ok) {
+        console.log("✅ OTP Sent Successfully", data);
+        navigation.navigate("OTPScreen");
+      } else {
+        Alert.alert("❌ Error", data.message || "Failed to send OTP. Try again.");
+      }
+    } catch (error) {
+      setLoading(false);
+      console.error("🚨 API call failed:", error);
+      Alert.alert("❌ Network Error", "Unable to connect. Please try again.");
     }
   };
 
@@ -48,15 +76,12 @@ const PANInputScreen = () => {
 
   return (
     <View style={styles.container}>
-      {/* Logo */}
       <Text style={styles.logo}>Wealthplus</Text>
 
-      {/* Progress Bar */}
       <View style={styles.progressBarContainer}>
         <Animated.View style={[styles.progressBar, { width: progressWidth }]} />
       </View>
 
-      {/* Form */}
       <View style={styles.formContainer}>
         <Text style={styles.title}>Enter your PAN</Text>
         <Text style={styles.subtitle}>We use this to verify your identity</Text>
@@ -65,10 +90,15 @@ const PANInputScreen = () => {
           placeholder="Enter your PAN (e.g., ABCDE1234F)"
           maxLength={10}
           value={panNumber}
-          onChangeText={(text) => setPanNumber(text.toUpperCase())} // Automatically convert input to uppercase
+          onChangeText={(text) => setPanNumber(text.toUpperCase())}
         />
-        <TouchableOpacity style={styles.button} onPress={handleProceed}>
-          <Text style={styles.buttonText}>Proceed →</Text>
+        
+        <TouchableOpacity style={styles.button} onPress={handleProceed} disabled={loading}>
+          {loading ? (
+            <ActivityIndicator size="small" color="#FFF" />
+          ) : (
+            <Text style={styles.buttonText}>Proceed →</Text>
+          )}
         </TouchableOpacity>
       </View>
     </View>
