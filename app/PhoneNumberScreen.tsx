@@ -9,11 +9,11 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList, "PhoneNumber
 
 const PhoneNumberScreen = () => {
   const navigation = useNavigation<NavigationProp>();
-  const [phoneNumber, setPhoneNumber] = useState(""); // ✅ State for phone number
+  const [phoneNumber, setPhoneNumber] = useState("9940615334"); // ✅ State for phone number
   const progress = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    fetchPhoneNumber(); // ✅ Auto-fetch phone number when the screen loads
+    // fetchPhoneNumber(); // ✅ Auto-fetch phone number when the screen loads
 
     Animated.timing(progress, {
       toValue: 0.25,
@@ -23,31 +23,31 @@ const PhoneNumberScreen = () => {
   }, []);
 
   // ✅ Auto-retrieve phone number
-  const fetchPhoneNumber = async () => {
-    try {
-      const number = await SmsRetriever.requestPhoneNumber();
-      if (number) {
-        setPhoneNumber(number.replace("+91", "").trim()); // ✅ Remove country code if needed
-      }
-    } catch (error) {
-      console.log("Error fetching phone number:", error);
-    }
-  };
+  // const fetchPhoneNumber = async () => {
+  //   try {
+  //     const number = await SmsRetriever.requestPhoneNumber();
+  //     if (number) {
+  //       setPhoneNumber(number.replace("+91", "").trim()); // ✅ Remove country code if needed
+  //     }
+  //   } catch (error) {
+  //     console.log("Error fetching phone number:", error);
+  //   }
+  // };
 
   // ✅ SMS Listener (useful for OTP auto-read)
-  const startSmsListener = async () => {
-    try {
-      const registered = await SmsRetriever.startSmsRetriever();
-      if (registered) {
-        SmsRetriever.addSmsListener((event) => {
-          console.log("Received SMS:", event.message);
-          SmsRetriever.removeSmsListener();
-        });
-      }
-    } catch (error) {
-      console.log("Error starting SMS listener:", error);
-    }
-  };
+  // const startSmsListener = async () => {
+  //   try {
+  //     const registered = await SmsRetriever.startSmsRetriever();
+  //     if (registered) {
+  //       SmsRetriever.addSmsListener((event) => {
+  //         console.log("Received SMS:", event.message);
+  //         SmsRetriever.removeSmsListener();
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.log("Error starting SMS listener:", error);
+  //   }
+  // };
 
   const validatePhoneNumber = () => {
     if (phoneNumber.length < 10) {
@@ -90,9 +90,9 @@ const PhoneNumberScreen = () => {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.smsButton} onPress={startSmsListener}>
+      {/* <TouchableOpacity style={styles.smsButton} onPress={startSmsListener}>
         <Text style={styles.smsButtonText}>Start SMS Listener</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 };

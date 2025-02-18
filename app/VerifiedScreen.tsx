@@ -37,7 +37,7 @@ const VerifiedScreen = () => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              reqId: '15043487',
+              reqId: 'test1',
               mobile: '+919940615334',
               type: 'mutual_funds',
             }),
@@ -46,7 +46,7 @@ const VerifiedScreen = () => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              reqId: '15043487',
+              reqId: 'test1',
               mobile: '+919940615334',
               type: 'mutual_funds',
             }),
@@ -55,7 +55,7 @@ const VerifiedScreen = () => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              reqId: '15043487',
+              reqId: 'test1',
               mobile: '+919940615334',
               type: 'mutual_funds',
             }),
@@ -64,16 +64,16 @@ const VerifiedScreen = () => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              reqId: '15043487',
+              reqId: 'test1',
               mobile: '+919940615334',
               type: 'mutual_funds',
             }),
           }),
-          fetch('https://api.inwealthera.com/api/api/portfolio/getPortfolioHealthDetailed', {
+          fetch('https://api.inwealthera.com/api/portfolio/getPortfolioHealthDetailed', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              reqId: '15043487',
+              reqId: 'test1',
               mobile: '+919940615334',
               type: 'mutual_funds',
             }),
