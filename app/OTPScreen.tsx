@@ -1,41 +1,88 @@
-import { useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Animated } from 'react-native';
+import { 
+  View, Text, TextInput, TouchableOpacity, 
+  StyleSheet, Animated, ActivityIndicator, Alert 
+} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from "./index";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-type NavigationProp = NativeStackNavigationProp<RootStackParamList, "OTPScreen">;
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, "VerifiedScreen">;
 
 const OTPScreen = () => {
   const navigation = useNavigation<NavigationProp>();
-  const [otp, setOtp] = useState('123456');
+
+  const [otp, setOtp] = useState('');
   const [progress, setProgress] = useState(new Animated.Value(0));
-  // const navigation = useNavigation();
+  const [loading, setLoading] = useState(false);
+  const [panNumber, setPanNumber] = useState('');
+  const [reqId, setReqId] = useState('');
 
   useEffect(() => {
     // Animate progress bar
     Animated.timing(progress, {
       toValue: 0.75,
-      duration: 1000, // 1 second
+      duration: 1000,
       useNativeDriver: false,
     }).start();
+
+    // Fetch stored PAN & request ID
+    const fetchStoredData = async () => {
+      try {
+        const storedPan = await AsyncStorage.getItem('panNumber');
+        const storedReqId = await AsyncStorage.getItem('reqId');
+
+        if (storedPan) setPanNumber(storedPan);
+        if (storedReqId) setReqId(storedReqId);
+      } catch (error) {
+        console.error("❌ Error retrieving data:", error);
+      }
+    };
+
+    fetchStoredData();
   }, []);
 
   const validateOTP = () => {
-    if (otp.length < 6) {
-      alert('OTP must be 6 digits.');
+    if (otp.length !== 6) {
+      Alert.alert("Invalid OTP", "OTP must be 6 digits.");
       return false;
     }
-
     return true;
   };
 
-  const handleProceed = () => {
-    if (validateOTP()) {
-      // Navigate to the next screen, e.g., "Dashboard" or "HomeScreen"
-    //   navigation.navigate('NextScreen');  // Replace 'NextScreen' with the actual screen name
+  const handleVerifyOTP = async () => {
+    if (!validateOTP()) return;
+
+    setLoading(true);
+
+    try {
+      const response = await fetch("https://api.wealthplus.com/mfcentral/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reqId, otp }),
+      });
+
+      const data = await response.json();
+      setLoading(false);
+
+      if (response.ok) {
+        console.log("✅ OTP Verified Successfully", data);
+        Alert.alert("✅ Success", "OTP verified successfully!");
+
+        // Store verified status (optional)
+        await AsyncStorage.setItem("isVerified", "true");
+
         navigation.navigate("VerifiedScreen");
-  }
+      } else {
+        Alert.alert("❌ Verification Failed", data.message || "Invalid OTP, please try again.");
+      }
+    } catch (error) {
+      setLoading(false);
+      console.error("🚨 API call failed:", error);
+      Alert.alert("❌ Network Error", "Unable to verify OTP. Please try again.");
+      navigation.navigate("VerifiedScreen");
+    }
   };
 
   const progressWidth = progress.interpolate({
@@ -45,18 +92,17 @@ const OTPScreen = () => {
 
   return (
     <View style={styles.container}>
-      {/* Logo */}
       <Text style={styles.logo}>Wealthplus</Text>
 
-      {/* Progress Bar */}
       <View style={styles.progressBarContainer}>
         <Animated.View style={[styles.progressBar, { width: progressWidth }]} />
       </View>
 
-      {/* OTP Form */}
       <View style={styles.formContainer}>
         <Text style={styles.title}>Enter OTP</Text>
-        <Text style={styles.subtitle}>sent to your phone number</Text>
+        <Text style={styles.subtitle}>sent to your registered phone</Text>
+        <Text style={styles.infoText}>Verifying for PAN: {panNumber || "N/A"}</Text>
+
         <TextInput
           style={styles.input}
           placeholder="Enter OTP"
@@ -65,8 +111,9 @@ const OTPScreen = () => {
           value={otp}
           onChangeText={setOtp}
         />
-        <TouchableOpacity style={styles.button} onPress={handleProceed}>
-          <Text style={styles.buttonText}>Proceed →</Text>
+
+        <TouchableOpacity style={styles.button} onPress={handleVerifyOTP} disabled={loading}>
+          {loading ? <ActivityIndicator size="small" color="#FFF" /> : <Text style={styles.buttonText}>Verify OTP →</Text>}
         </TouchableOpacity>
       </View>
     </View>
@@ -116,7 +163,13 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     color: '#888888',
-    marginBottom: 20,
+    marginBottom: 10,
+  },
+  infoText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#555',
+    marginBottom: 15,
   },
   input: {
     height: 50,
