@@ -4,10 +4,8 @@
 
 # Android/IntelliJ
 #
-build/
 .idea
 .gradle
-local.properties
 *.iml
 *.hprof
 .cxx/

@@ -1,0 +1,26 @@
+{
+  "installationFolder": "C:\\Users\\tnare\\Desktop\\NARESH\\Coding\\Wealthplus-App - Copy\\node_modules\\@shopify\\react-native-skia\\android\\build\\intermediates\\prefab_package\\debug\\prefab",
+  "gradlePath": ":shopify_react-native-skia",
+  "packageInfo": {
+    "packageName": "shopify_react-native-skia",
+    "packageSchemaVersion": 2,
+    "packageDependencies": [],
+    "modules": [
+      {
+        "moduleName": "rnskia",
+        "moduleHeaders": "C:\\Users\\tnare\\Desktop\\NARESH\\Coding\\Wealthplus-App - Copy\\node_modules\\@shopify\\react-native-skia\\android\\build\\headers\\rnskia",
+        "moduleExportLibraries": [],
+        "abis": [
+          {
+            "abiName": "arm64-v8a",
+            "abiApi": 24,
+            "abiNdkMajor": 26,
+            "abiStl": "c++_shared",
+            "abiLibrary": "C:\\Users\\tnare\\Desktop\\NARESH\\Coding\\Wealthplus-App - Copy\\node_modules\\@shopify\\react-native-skia\\android\\build\\intermediates\\cxx\\Debug\\33695z5x\\obj\\arm64-v8a\\librnskia.so",
+            "abiAndroidGradleBuildJsonFile": "C:\\Users\\tnare\\Desktop\\NARESH\\Coding\\Wealthplus-App - Copy\\node_modules\\@shopify\\react-native-skia\\android\\.cxx\\Debug\\33695z5x\\arm64-v8a\\android_gradle_build.json"
+          }
+        ]
+      }
+    ]
+  }
+}
